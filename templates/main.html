@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Webcam Access in HTML5 tutorial</title>
+	<style type="text/css">
+		#vidDisplay {
+			width: 500px;
+			height: 375px;
+			background-color: #666;
+
+		}
+		#container {
+			margin: 0px auto;
+			width: 500px;
+			height: 375px;
+			border: 10px #FF0000 solid;
+			overflow: hidden;
+		}
+	</style>
+</head>
+<body bgcolor="skyblue">
+	<center id="container">
+		<video style="height:100%; width:100%; right:-0%; bottom:-0%; position:relative" id='vidDisplay' autoplay="true">
+			blah blah blah 
+		</video>
+	</center>
+	<center>
+		<div class="slidecontainer">
+	 		<input type="range" min="1" max="4" value="1" class="slider" id="myRange" step="0.1" onchange="zoomFN()">
+		</div>
+	</center>
+	<script type="text/javascript">
+
+		// setting up video/webcam feed code
+		var video = document.getElementById("vidDisplay");
+		navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia || navigator.oGetUserMedia;
+		if (navigator.getUserMedia) {
+			navigator.getUserMedia({video: true}, handleVideo, videoError);
+		}
+		function handleVideo(stream) {
+			
+			//alert("hee")
+			try {
+				//alert("blah blah blah")
+  				video.srcObject = stream;
+			} catch (error) {
+				alert("nmeee")
+  				video.src = window.URL.createObjectURL(stream);
+			}
+		}
+
+		function videoError(e) {
+			alert("There is a problem");
+		}
+
+		// zoom for video
+		var theSlider = document.getElementById('myRange');
+		function zoomFN() {
+			var zoomlevel = theSlider.valueAsNumber;
+  			//video.style.webkitTransform = "scale("+zoomlevel+")";
+			video.style['transform'] = "scale("+zoomlevel+")";
+		}
+
+	</script>
+</body>
+</html>
