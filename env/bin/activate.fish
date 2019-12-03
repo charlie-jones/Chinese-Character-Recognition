@@ -29,7 +29,7 @@ end
 # unset irrelevant variables
 deactivate nondestructive
 
-set -gx VIRTUAL_ENV "/Users/isabelhaas/Documents/Chinese-Character-Recognition/env"
+set -gx VIRTUAL_ENV "/Users/jones/Documents/DP2019-20Winter/env"
 
 set -gx _OLD_VIRTUAL_PATH $PATH
 set -gx PATH "$VIRTUAL_ENV/bin" $PATH
