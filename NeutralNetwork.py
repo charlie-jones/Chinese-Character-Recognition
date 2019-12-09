@@ -1,13 +1,36 @@
-import numpy as np
+
+from numpy import exp, array, random, dot
 
 # source for information about neural nets & examples: http://neuralnetworksanddeeplearning.com/chap1.html 
 
-class NeuralNet(object):
+class NeuralNode():
+    n_inputs = 0 # number of inputs per neuron
+    weights = [] # store the weights per input
 
-    def __init__(self): 
+    def __init__(self, n_inputs):
+        self.n_inputs = n_inputs
+        self.setWeights(n_inputs)
+    def setWeights(self, n_inputs):
+        # create array of random weights btn 0 and 1
+        self.weights = [random.uniform(0,1) for x in range(0,n_inputs)]
+
+        
+class NeuralLayer():
+    n_nodes = 0
+    nodes = [] # array of nodes in layer
+    def __init__(self, n_nodes, n_inputs):
+        self.n_nodes = n_nodes
+        # create n_nodes amount of NeuralNodes
+        self.nodes = [NeuralNode(n_inputs) for _ in range(0, n_nodes)]
+
+class NeuralNetwork(object):
+
+    def __init__(self):
+        # rand num gen 
+
         # # of layers (can set this to whatever we want later, could add a parameter to the constructor for this, etc)
         self.numLayers = 3
-        
+
         # # of neurons in each layer (can change this later) 
         # array of size self.numLayers where neurons[0] is the # of neurons in the first layer
         self.neurons = [3,4,3]
@@ -38,19 +61,16 @@ class NeuralNet(object):
             rtn = sigmoid(np.dot(input, self.weights[layer]) + self.biases[layer]) 
             return self.feedForward(rtn, layer+1)
 
-
-
-
     # still need to do these
     def gradientDescent(self):
         return
     def backprop(self):  
         return
 
-# sigmoid function: 1 / (1 + e^ -x) 
-def sigmoid(x): 
-    return 1.0 /(1.0 + np.exp(-x)) # this still works when the input x is a numpy array; it's applied to each element in the array individually
+    # sigmoid function: 1 / (1 + e^ -x) 
+    def sigmoid(x): 
+        return 1.0 /(1.0 + exp(-x)) # this still works when the input x is a numpy array; it's applied to each element in the array individually
 
-# derivative of sigmoid function
-def sigmoidDerivative(x): 
-    return sigmoid(x) * ( 1-sigmoid(x))   
+    # derivative of sigmoid function
+    def sigmoidDerivative(x): 
+        return sigmoid(x) * ( 1-sigmoid(x))   
