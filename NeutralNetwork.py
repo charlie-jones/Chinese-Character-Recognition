@@ -43,7 +43,12 @@ class NeuralNetwork(object):
         # weights matrix: each row is the weights for the connections from one neuron to the neurons in the next layer
         # there are n-1 weights matrices for n layers b/c there are no weights before the first layer
         # so weights[0] is the weights between the first and second layers
-        self.weights = [np.random.randn(self.numLayers, a) for a in self.neurons[1:]] 
+        # weights matrix dimensions are prev layer x next layer (# of rows = # of neurons in prev layer, # of cols is # of neurons in next layer)
+        self.weights = [np.random.randn(b, a) for a, b in zip(self.neurons[1:], self.neurons)] 
+        
+        #this would switch the dimensions (the weights matrix would be next layer x prev layer, opposite of what we currently have)
+        #leaving this here b/c not sure which will work so might need to switch it to this later
+        #self.weights = [np.random.randn(y, x) for x, y in zip(self.neurons[:-1], self.neurons[1:])]
 
 
 
