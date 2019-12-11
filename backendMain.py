@@ -32,3 +32,14 @@ print(u'Detected source language: {}'.format(
     result['detectedSourceLanguage']))'''
 
 
+"""
+#open the Uni2Pinyin.txt
+String arr = .readLine();
+while (arr[0] != null && arr[0] != #) {
+	#split arr
+	String character = code[0]
+	String pinyin = code[1]
+	# store into a hashmap or other dataset
+} 
+
+
