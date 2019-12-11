@@ -1,6 +1,7 @@
 from flask import Flask
 from flask import render_template
 import pinyin
+import pinyin.cedict
 
 app = Flask(__name__)
 
@@ -52,4 +53,9 @@ print pinyin.get('你好', format="numerical")
 print pinyin.get_initial('你好')
 '''
 
+"""
+pinyin.cedict.translate_word('你')
+pinyin.cedict.translate_word('你好')
+list(pinyin.cedict.all_phrase_translations('你好'))
+"""
 
