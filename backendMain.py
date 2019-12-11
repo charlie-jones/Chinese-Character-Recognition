@@ -1,5 +1,7 @@
 from flask import Flask
 from flask import render_template
+import pinyin
+
 app = Flask(__name__)
 
 @app.route("/")
@@ -41,5 +43,13 @@ while (arr[0] != null && arr[0] != #) {
 	String pinyin = code[1]
 	# store into a hashmap or other dataset
 } 
+"""
+
+'''
+print pinyin.get('你 好')
+print pinyin.get('你好', format="strip", delimiter=" ")
+print pinyin.get('你好', format="numerical")
+print pinyin.get_initial('你好')
+'''
 
 
