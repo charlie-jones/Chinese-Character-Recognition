@@ -1,96 +1,65 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-	<title>Webcam Access in HTML5 tutorial</title>
-	<style type="text/css">
-		#vidDisplay {
-			width: 500px;
-			height: 375px;
-			background-color: #666;
+  <meta charset="UTF-8">
+  <title>HTML5 Media Device Access</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    video, img {
+      max-width:100%;
+    }
 
-		}
-		#container {
+	#container {
 			margin: 0px auto;
 			width: 500px;
 			height: 375px;
 			border: 10px #FF0000 solid;
 			overflow: hidden;
-		}
-	</style>
+	}
+  </style>
 </head>
-<body bgcolor="skyblue">
-	<center id="container">
-		<video style="height:100%; width:100%; right:-0%; bottom:-0%; position:relative" id='vidDisplay' autoplay="true">
-			blah blah blah 
-		</video>
-	</center>
-	<center>
-		<div class="slidecontainer">
-	 		<input type="range" min="1" max="4" value="1" class="slider" id="myRange" step="0.1" onchange="zoomFN()">
-		</div>
-		<button onclick="takepicture()">Take Pictures</button>
-	</center>
-	<script type="text/javascript">
+<body>
 
-		// setting up video/webcam feed code
-		var video = document.getElementById("vidDisplay");
-		navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia || navigator.oGetUserMedia;
-		if (navigator.getUserMedia) {
-			navigator.getUserMedia(
-				// Options
-				{
-					video: true
-				},
-				// Success Callback
-				function(stream){
-					// Create an object URL for the video stream and
-					// set it as src of our HTLM video element.
-					video.src = window.URL.createObjectURL(stream);
-					// Play the video element to show the stream to the user.
-					video.play();
-				},
-				// Error Callback
-				function(err){
-					// Most common errors are PermissionDenied and DevicesNotFound.
-					console.error(err);
-				}
-			);
-		}
+<video autoplay></video>
+<button onclick="takeSnapshot()">Translate</button>
 
-		// zoom for video
-		var theSlider = document.getElementById('myRange');
-		function zoomFN() {
-			var zoomlevel = theSlider.valueAsNumber;
-  			//video.style.webkitTransform = "scale("+zoomlevel+")";
-			video.style['transform'] = "scale("+zoomlevel+")";
-		}
+<script>
+  
+    'use strict';
+    var video = document.querySelector('video'), 
+				canvas;
 
-		function takepicture(){
-			var hidden_canvas = document.querySelector('canvas'),
-			image = document.querySelector('img.photo'),
+    /**
+     *  generates a still frame image from the stream in the <video>
+     *  appends the image to the <body>
+     */
+    function takeSnapshot() {
+      var img = document.querySelector('img') || document.createElement('img');
+      var context;
+      var width = video.offsetWidth,
+          height = video.offsetHeight;
 
-			
-			// Get the exact size of the video element.
-			width = video.width,
-			height = video.height,
+      canvas = canvas || document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
 
-			// Context object for working with the canvas.
-			context = hidden_canvas.getContext('2d');
-			// Set the canvas to the same dimensions as the video.
-			hidden_canvas.width = width;
-			hidden_canvas.height = height;
+      context = canvas.getContext('2d');
+      context.drawImage(video, 0, 0, width, height);
 
-			// Draw a copy of the current frame from the video on the canvas.
-			context.drawImage(video, 0, 0, width, height);
+      img.src = canvas.toDataURL('image/png');
+      document.body.appendChild(img);
+    }
 
-			// Get an image dataURL from the canvas.
-			var imageDataURL = hidden_canvas.toDataURL('image/png');
-
-			// Set the dataURL as source of an image element, showing the captured photo.
-			image.setAttribute('src', imageDataURL); 
-
-		}
-
-	</script>
+    if (navigator.mediaDevices) {
+      navigator.mediaDevices.getUserMedia({video: true})
+        .then(function(stream) {
+          video.src = window.URL.createObjectURL(stream);
+          video.addEventListener('click', takeSnapshot);
+        })
+        .catch(function(error) {
+          document.body.textContent = error.name;
+        });
+    }
+</script>
 </body>
 </html>
