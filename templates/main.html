@@ -28,6 +28,7 @@
 		<div class="slidecontainer">
 	 		<input type="range" min="1" max="4" value="1" class="slider" id="myRange" step="0.1" onchange="zoomFN()">
 		</div>
+		<button onclick="takepicture()">Take Pictures</button>
 	</center>
 	<script type="text/javascript">
 
@@ -35,22 +36,25 @@
 		var video = document.getElementById("vidDisplay");
 		navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia || navigator.oGetUserMedia;
 		if (navigator.getUserMedia) {
-			navigator.getUserMedia({video: true}, handleVideo, videoError);
-		}
-		function handleVideo(stream) {
-			
-			//alert("hee")
-			try {
-				//alert("blah blah blah")
-  				video.srcObject = stream;
-			} catch (error) {
-				alert("nmeee")
-  				video.src = window.URL.createObjectURL(stream);
-			}
-		}
-
-		function videoError(e) {
-			alert("There is a problem");
+			navigator.getUserMedia(
+				// Options
+				{
+					video: true
+				},
+				// Success Callback
+				function(stream){
+					// Create an object URL for the video stream and
+					// set it as src of our HTLM video element.
+					video.src = window.URL.createObjectURL(stream);
+					// Play the video element to show the stream to the user.
+					video.play();
+				},
+				// Error Callback
+				function(err){
+					// Most common errors are PermissionDenied and DevicesNotFound.
+					console.error(err);
+				}
+			);
 		}
 
 		// zoom for video
@@ -59,6 +63,32 @@
 			var zoomlevel = theSlider.valueAsNumber;
   			//video.style.webkitTransform = "scale("+zoomlevel+")";
 			video.style['transform'] = "scale("+zoomlevel+")";
+		}
+
+		function takepicture(){
+			var hidden_canvas = document.querySelector('canvas'),
+			image = document.querySelector('img.photo'),
+
+			
+			// Get the exact size of the video element.
+			width = video.width,
+			height = video.height,
+
+			// Context object for working with the canvas.
+			context = hidden_canvas.getContext('2d');
+			// Set the canvas to the same dimensions as the video.
+			hidden_canvas.width = width;
+			hidden_canvas.height = height;
+
+			// Draw a copy of the current frame from the video on the canvas.
+			context.drawImage(video, 0, 0, width, height);
+
+			// Get an image dataURL from the canvas.
+			var imageDataURL = hidden_canvas.toDataURL('image/png');
+
+			// Set the dataURL as source of an image element, showing the captured photo.
+			image.setAttribute('src', imageDataURL); 
+
 		}
 
 	</script>
