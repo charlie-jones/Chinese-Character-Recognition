@@ -5,61 +5,73 @@
   <title>HTML5 Media Device Access</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    video, img {
+    button, video, img {
       max-width:100%;
     }
-
-	#container {
-			margin: 0px auto;
-			width: 500px;
-			height: 375px;
-			border: 10px #FF0000 solid;
-			overflow: hidden;
-	}
+    #vidDisplay {
+      margin: 0px auto;
+      overflow: hidden;
+      display: block;
+    }
+    #container {
+      margin: 0px auto;
+      width: 840px;
+      height: 475px;
+      border: 10px #FF0000 solid;
+      overflow: hidden;
+      display: block;
+    }
   </style>
 </head>
 <body>
-
-<video autoplay></video>
 <button onclick="takeSnapshot()">Translate</button>
+<div id="container">
+  <video autoplay></video><br>
+</div>
 
 <script>
-  
-    'use strict';
-    var video = document.querySelector('video'), 
-				canvas;
+  'use strict';
+  var video = document.querySelector('video'), canvas;
+  var slider = document.getElementById('zoomRange');
+  // create the actual video
+  if (navigator.mediaDevices) {
+    navigator.mediaDevices.getUserMedia({video: true})
+      .then(function(stream) { 
+        video.src = window.URL.createObjectURL(stream);
+      })
+      .catch(function(error) {
+        document.body.textContent = error.name;
+      });
+  }
 
-    /**
-     *  generates a still frame image from the stream in the <video>
-     *  appends the image to the <body>
-     */
-    function takeSnapshot() {
-      var img = document.querySelector('img') || document.createElement('img');
-      var context;
-      var width = video.offsetWidth,
-          height = video.offsetHeight;
+  /**
+    * takes pic from video and saves to file
+    */
+  function takeSnapshot() {
+    var img = document.querySelector('img') || document.createElement('img');
+    var context;
+    var width = video.videoWidth,
+    height = video.videoHeight;
 
-      canvas = canvas || document.createElement('canvas');
-      canvas.width = width;
-      canvas.height = height;
-
-      context = canvas.getContext('2d');
-      context.drawImage(video, 0, 0, width, height);
-
-      img.src = canvas.toDataURL('image/png');
-      document.body.appendChild(img);
+    canvas = canvas || document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    context = canvas.getContext('2d');
+    context.drawImage(video, 0, 0, width, height);
+    for(var h = 0; h < width/20; h++){
+      for(var w = 0; w < height/20; w++){
+        var data = context.getImageData(w,h,1,1).data;
+        console.log(w + ", " + h);
+        console.log(data[0]);
+        console.log(data[1]);
+        console.log(data[2]);
+        console.log("______________");
+      }
     }
-
-    if (navigator.mediaDevices) {
-      navigator.mediaDevices.getUserMedia({video: true})
-        .then(function(stream) {
-          video.src = window.URL.createObjectURL(stream);
-          video.addEventListener('click', takeSnapshot);
-        })
-        .catch(function(error) {
-          document.body.textContent = error.name;
-        });
-    }
+    
+    img.src = canvas.toDataURL('image/png');
+    document.body.appendChild(img);
+  }
 </script>
 </body>
 </html>
