@@ -1,7 +1,7 @@
 from flask import Flask
 from flask import render_template
-import pinyin
-import pinyin.cedict
+#import pinyin
+#import pinyin.cedict
 
 app = Flask(__name__)
 
