@@ -6,15 +6,17 @@ from numpy import exp, array, random, dot
 class NeuralNode:
     n_inputs = 0 # number of inputs per neuron
     weights = [] # store the weights per input
+    bias = 0
 
     def __init__(self, n_inputs):
         self.n_inputs = n_inputs
+        self.bias = random.rand(1) # random bias
         self.setWeights(n_inputs)
     def setWeights(self, n_inputs):
         # create array of random weights btn 0 and 1
         self.weights = [random.uniform(0,1) for x in range(0,n_inputs)]
-    def sum(self, inputs): # summation of weight * input
-        return dot(inputs, weights)
+    def sum(self, inputs): # summation of weight * input. Used for feeding forward
+        return dot(inputs, weights) + self.bias
         
 class NeuralLayer:
     n_nodes = 0
@@ -53,7 +55,7 @@ class NeuralNetwork:
     # returns the output of the network given an input
     # output of a layer is: sigmoid of (weights*input + biases)
     # input = array of vectors of all neurons in given layer 
-    # layer = index of which layer it's on starting from 0 (to use the right weight matrix for that layer) 
+    # layers = index of which layer it's on starting from 0 (to use the right weight matrix for that layer) 
     def feedForward(self, inputs, layerIdx): 
         if layerIdx < (len(self.layers) and len(inputs) == len(layer[layerIdx].neurons)): # check layer is valid & have same # of inputs as neurons
             outputs = []
