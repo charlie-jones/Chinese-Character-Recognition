@@ -66,6 +66,7 @@ class NeuralNetwork:
                 currInputs = inputs[idx]
                 neuronSum = currNeuron.sum(currInputs) 
                 neuronSum = sigmoid(neuronSum)
+                currNeuron.output = neuronSum # used in backpropagation
                 outputs.append(neuronSum)
                 inputs = outputs
             return self.feedForward(inputs, layerIdx+1)
@@ -74,6 +75,36 @@ class NeuralNetwork:
         
        # for each layer: sigmoid of dot product of the input vector with the weight matrix (multiplying all the activations by the weights) + the biases
 
+# https://machinelearningmastery.com/implement-backpropagation-algorithm-scratch-python/
+    # Backpropagate error and store in neurons
+    def backward_propagate_error(self, expected):
+        for i in reversed(range(len(self.layers))):
+            layer = self.layers[i]
+            errors = list()
+            if i != len(self.layers)-1:
+                for j in range(len(layer)):
+                    error = 0.0
+                    for neuron in self.layers[i + 1]:
+                        error += (neuron.weights[j] * neuron.delta)
+                    errors.append(error)
+            else:
+                for j in range(len(layer)):
+                    neuron = layer[j]
+                    errors.append(expected[j] - neuron.output)
+            for j in range(len(layer)):
+                neuron = layer[j]
+                neuron.delta = errors[j] * sigmoidDerivative(neuron.output)
+    
+    # Update network weights with error
+    def update_weights(self, row, l_rate):
+        for i in range(len(self.layers)):
+            inputs = row[:-1]
+            if i != 0:
+                inputs = [neuron.output for neuron in self.layers[i - 1]]
+            for neuron in self.layers[i]:
+                for j in range(len(inputs)):
+                    neuron.weights[j] += l_rate * neuron.delta * inputs[j]
+                neuron.weights[-1] += l_rate * neuron.delta
 
     # still need to do these
     def gradientDescent(self):
