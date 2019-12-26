@@ -1,5 +1,6 @@
 
 from numpy import exp, array, random, dot
+import numpy as np
 
 # source for information about neural nets & examples: http://neuralnetworksanddeeplearning.com/chap1.html 
 
@@ -60,18 +61,18 @@ class NeuralNetwork:
     # input = array of =inputs
     # layers = index of which layer it's on starting from 0 (to use the right weight matrix for that layer) 
     def feedForward(self, inputs, layerIdx): 
-        if (layerIdx < len(self.layers): # check layer is valid
+        if (layerIdx < len(self.layers)): # check layer is valid
             outputs = []
             currLayer = self.layers[layerIdx]
             for idx in range(currLayer.n_nodes): # loop thru all nodes in current layer
-                currNeuron = currLayer.neurons[idx]
+                currNeuron = currLayer.nodes[idx]
                 neuronSum = sigmoid(currNeuron.sum(inputs)) # sum in node w/ activation
                 currNeuron.output = neuronSum # used in backpropagation
                 outputs.append(neuronSum)
-                inputs = outputs
+            inputs = outputs
             return self.feedForward(inputs, layerIdx+1)
         else:
-            return input
+            return inputs
         
        # for each layer: sigmoid of dot product of the input vector with the weight matrix (multiplying all the activations by the weights) + the biases
 
@@ -132,7 +133,7 @@ def readTrainingData(filename):
     input2 = []
     for entry in input:
         entry = np.delete(entry, 0) # delete the index of the image
-        entry = np.reshape(entry, (128, 128)) # convert 1d to 2d array
+        #entry = np.reshape(entry, (128, 128)) # convert 1d to 2d array
         entry = entry.tolist() #convert from numpy array to list
         input2.append(entry)
     return input2
@@ -145,5 +146,20 @@ def readImageData(filename):
     input = np.reshape(input, (128,128)) # convert list into 128 x 128 2d array
     input = input.tolist() # convert numpy array to list
     return input 
+'''
+def test():
+    network = NeuralNetwork(16384, 6825, 5, 1 )
+    data = readTrainingData("imageOutput2.txt")
+    data2 = []
+    for a in data:
+        b = [int(i) for i in a]
+        data2.append(b)
+    #print(type(data2[0][0]))
+    output = network.feedForward(data2[0], 0);
+    maxVal = max(output)
+    idx = output.index(maxVal)
+    print(idx)
+    return
 
+test()'''
 # https://www.kdnuggets.com/2018/04/building-convolutional-neural-network-numpy-scratch.html
