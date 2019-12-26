@@ -28,6 +28,10 @@
 <div id="container">
   <video id="vidDisplay" autoplay></video><br>
 </div>
+<div style="text-align: center">
+  <h2 id="translation">translate from top left</h2>
+</div>
+
 
 
 <!-- <form action="index" method="post">
@@ -106,6 +110,17 @@
 
     var req = new XMLHttpRequest();
         
+    var translation = document.getElementById('translation');
+    req.onreadystatechange = function()
+    {
+      if(this.readyState == 4 && this.status == 200) {
+        translation.innerHTML = "output: " + this.responseText;
+      } 
+      /*else {
+        translation.innerHTML = "output pending.....";
+      }*/
+    }
+
     req.open('POST', '/', true);
     req.setRequestHeader('content-type', 'application/x-www-form-urlencoded;charset=UTF-8');
     req.send("data=" + arr); // can pass arr (2d array) or data (string)
@@ -119,8 +134,8 @@
         if (err) throw err; 
     }); */
 
-    img.src = canvas.toDataURL('image/png');
-    document.body.appendChild(img);
+    /*img.src = canvas.toDataURL('image/png');
+    document.body.appendChild(img);*/
     
     
   }

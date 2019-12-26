@@ -12,7 +12,11 @@ def index():
 	if request.method == "POST":
 		name = request.form["data"]
 		print(name)
-		#return name + " Hello"
+		# pass through neural network to get label
+		# from label get the Chinese character
+		# translate character into english and pinyin
+		# return the english and pinyin (which should put as a string on the page)
+		return "blahhhh"
 	return render_template("main.html")
 	
 
