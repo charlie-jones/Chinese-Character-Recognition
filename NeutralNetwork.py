@@ -7,6 +7,7 @@ class NeuralNode:
     n_inputs = 0 # number of inputs per neuron
     weights = [] # store the weights per input
     bias = 0
+    output = 0
 
     def __init__(self, n_inputs):
         self.n_inputs = n_inputs
@@ -56,16 +57,15 @@ class NeuralNetwork:
     #  *** this might not completely work yet, just a first draft ***  
     # returns the output of the network given an input
     # output of a layer is: sigmoid of (weights*input + biases)
-    # input = array of vectors of all neurons in given layer 
+    # input = array of =inputs
     # layers = index of which layer it's on starting from 0 (to use the right weight matrix for that layer) 
     def feedForward(self, inputs, layerIdx): 
         if layerIdx < len(self.layers) and len(inputs) == len(self.layers[layerIdx].neurons): # check layer is valid & have same # of inputs as neurons
             outputs = []
-            for idx in range(len(inputs)):
-                currNeuron = self.layers[layerIdx].neurons[idx]
-                currInputs = inputs[idx]
-                neuronSum = currNeuron.sum(currInputs) 
-                neuronSum = sigmoid(neuronSum)
+            currLayer = self.layers[layerIdx]
+            for idx in range(currLayer.n_nodes): # loop thru all nodes in current layer
+                currNeuron = currLayer.neurons[idx]
+                neuronSum = sigmoid(currNeuron.sum(inputs)) # sum in node w/ activation
                 currNeuron.output = neuronSum # used in backpropagation
                 outputs.append(neuronSum)
                 inputs = outputs
