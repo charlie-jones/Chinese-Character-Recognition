@@ -108,7 +108,7 @@
         
     req.open('POST', '/', true);
     req.setRequestHeader('content-type', 'application/x-www-form-urlencoded;charset=UTF-8');
-    req.send("data=" + data);
+    req.send("data=" + arr); // can pass arr (2d array) or data (string)
     
 
 
