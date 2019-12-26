@@ -10,7 +10,6 @@ class NeuralNode:
 
     def __init__(self, n_inputs):
         self.n_inputs = n_inputs
-        self.bias = random.rand(1) # random bias
         self.setWeights(n_inputs)
         self.setBias()
     def setWeights(self, n_inputs):
@@ -19,7 +18,7 @@ class NeuralNode:
     def setBias(self):
         self.bias = random.uniform(0,1) # set bias to a random number
     def sum(self, inputs): # summation of weight * input
-        return dot(inputs, self.weights)
+        return dot(inputs, self.weights) + bias
         
 class NeuralLayer:
     n_nodes = 0
