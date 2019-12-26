@@ -9,9 +9,9 @@
       max-width:100%;
     }
     #vidDisplay {
-      margin: 0px auto;
-      overflow: hidden;
-      display: block;
+      object-fit: initial;
+      width: 500px;
+      height: 500px;
     }
     #container {
       margin: 0px auto;
@@ -26,7 +26,7 @@
 <body>
 <button onclick="takeSnapshot()">Translate</button>
 <div id="container">
-  <video autoplay></video><br>
+  <video id="vidDisplay" autoplay></video><br>
 </div>
 
 <script>
@@ -56,7 +56,7 @@
     canvas.width = width;
     canvas.height = height;
     var context = canvas.getContext('2d');
-    context.drawImage(video, 0, 0, width, height);
+    context.drawImage(video, 0, 0, 500, 500);
 
     // for(var h = 0; h < width/20; h++){
     //   for(var w = 0; w < height/20; w++){
