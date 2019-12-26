@@ -29,6 +29,13 @@
   <video id="vidDisplay" autoplay></video><br>
 </div>
 
+
+<!-- <form action="index" method="post">
+  <label>Name:<input type="text" id="name" value="" /></label>
+  <button type="button" id="btn-post" onclick="do_ajax();">Click</button>
+  <div id="result"></div>
+</form> -->
+
 <script>
   'use strict';
   var video = document.querySelector('video');
@@ -43,6 +50,14 @@
         document.body.textContent = error;
       });
   }
+
+  /*function do_ajax() {
+        var req = new XMLHttpRequest();
+        
+        req.open('POST', '/', true);
+        req.setRequestHeader('content-type', 'application/x-www-form-urlencoded;charset=UTF-8');
+        req.send("name=" + document.getElementById('name').value);
+      }*/
 
   /**
     * takes pic from video
@@ -88,6 +103,12 @@
       } 
       data += "\n"; 
     } 
+
+    var req = new XMLHttpRequest();
+        
+    req.open('POST', '/', true);
+    req.setRequestHeader('content-type', 'application/x-www-form-urlencoded;charset=UTF-8');
+    req.send("data=" + data);
     
 
 

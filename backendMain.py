@@ -1,14 +1,27 @@
 from flask import Flask
 from flask import render_template
+from flask import request
+#from NeutralNetwork import NeuralNetwork, NeuralLayer, NeuralNode
 #import pinyin
 #import pinyin.cedict
 
 app = Flask(__name__)
 
-@app.route("/")
-@app.route("/home")
-def home():
-	return render_template('main.html')
+@app.route("/", methods=['GET', 'POST'])
+def index():
+	if request.method == "POST":
+		name = request.form["data"]
+		print(name)
+		#return name + " Hello"
+	return render_template("main.html")
+	
+
+#@app.route('/get_names', methods=['POST'])
+#def get_names():
+   #if request.method == 'POST':
+   	 #name = request.form["data"]
+   	 
+	   
 
 if __name__ == '__main__':
 	app.run(debug=True)
