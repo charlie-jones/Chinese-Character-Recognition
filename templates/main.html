@@ -15,8 +15,8 @@
     }
     #container {
       margin: 0px auto;
-      width: 840px;
-      height: 475px;
+      width: 640px;
+      height: 350px;
       border: 10px #FF0000 solid;
       overflow: hidden;
       display: block;
@@ -31,16 +31,16 @@
 
 <script>
   'use strict';
-  var video = document.querySelector('video'), canvas;
+  var video = document.querySelector('video');
   var slider = document.getElementById('zoomRange');
   // create the actual video
   if (navigator.mediaDevices) {
     navigator.mediaDevices.getUserMedia({video: true})
       .then(function(stream) { 
-        video.src = window.URL.createObjectURL(stream);
+        video.srcObject = stream;
       })
       .catch(function(error) {
-        document.body.textContent = error.name;
+        document.body.textContent = error;
       });
   }
 
@@ -49,25 +49,25 @@
     */
   function takeSnapshot() {
     var img = document.querySelector('img') || document.createElement('img');
-    var context;
-    var width = video.videoWidth,
-    height = video.videoHeight;
+    var width = video.videoWidth;
+    var height = video.videoHeight;
 
-    canvas = canvas || document.createElement('canvas');
+    var canvas = canvas || document.createElement('canvas');
     canvas.width = width;
     canvas.height = height;
-    context = canvas.getContext('2d');
+    var context = canvas.getContext('2d');
     context.drawImage(video, 0, 0, width, height);
-    for(var h = 0; h < width/20; h++){
-      for(var w = 0; w < height/20; w++){
-        var data = context.getImageData(w,h,1,1).data;
-        console.log(w + ", " + h);
-        console.log(data[0]);
-        console.log(data[1]);
-        console.log(data[2]);
-        console.log("______________");
-      }
-    }
+
+    // for(var h = 0; h < width/20; h++){
+    //   for(var w = 0; w < height/20; w++){
+    //     var data = context.getImageData(w,h,1,1).data;
+    //     console.log(w + ", " + h);
+    //     console.log(data[0]);
+    //     console.log(data[1]);
+    //     console.log(data[2]);
+    //     console.log("______________");
+    //   }
+    // }
     
     img.src = canvas.toDataURL('image/png');
     document.body.appendChild(img);
