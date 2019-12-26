@@ -60,7 +60,7 @@ class NeuralNetwork:
     # input = array of =inputs
     # layers = index of which layer it's on starting from 0 (to use the right weight matrix for that layer) 
     def feedForward(self, inputs, layerIdx): 
-        if layerIdx < len(self.layers) and len(inputs) == len(self.layers[layerIdx].neurons): # check layer is valid & have same # of inputs as neurons
+        if layerIdx < len(self.layers)): # check layer is valid
             outputs = []
             currLayer = self.layers[layerIdx]
             for idx in range(currLayer.n_nodes): # loop thru all nodes in current layer
