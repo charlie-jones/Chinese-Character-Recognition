@@ -10,11 +10,14 @@ class NeuralNode:
     def __init__(self, n_inputs):
         self.n_inputs = n_inputs
         self.setWeights(n_inputs)
+        self.setBias()
     def setWeights(self, n_inputs):
         # create array of random weights btn 0 and 1
         self.weights = [random.uniform(0,1) for x in range(0,n_inputs)]
+    def setBias(self):
+        self.bias = random.uniform(0,1) # set bias to a random number
     def sum(self, inputs): # summation of weight * input
-        return dot(inputs, weights)
+        return dot(inputs, self.weights)
         
 class NeuralLayer:
     n_nodes = 0
@@ -43,11 +46,11 @@ class NeuralNetwork:
         
     def create(self):
         # first layer
-        self.layers = [NeuronLayer(self.n_neurons_to_hl,self.n_inputs)]
+        self.layers = [NeuralLayer(self.n_neurons_to_hl,self.n_inputs)]
         # hidden layers
-        self.layers += [NeuronLayer( self.n_neurons_to_hl,self.n_neurons_to_hl) for x in range(0,self.n_hidden_layers)]
+        self.layers += [NeuralLayer( self.n_neurons_to_hl,self.n_neurons_to_hl) for x in range(0,self.n_hidden_layers)]
         # hidden-to-output layer
-        self.layers += [NeuronLayer(self.n_outputs,self.n_neurons_to_hl)]
+        self.layers += [NeuralLayer(self.n_outputs,self.n_neurons_to_hl)]
 
     #  *** this might not completely work yet, just a first draft ***  
     # returns the output of the network given an input
@@ -55,13 +58,13 @@ class NeuralNetwork:
     # input = array of vectors of all neurons in given layer 
     # layer = index of which layer it's on starting from 0 (to use the right weight matrix for that layer) 
     def feedForward(self, inputs, layerIdx): 
-        if layerIdx < (len(self.layers) and len(inputs) == len(layer[layerIdx].neurons)): # check layer is valid & have same # of inputs as neurons
+        if layerIdx < len(self.layers) and len(inputs) == len(self.layers[layerIdx].neurons): # check layer is valid & have same # of inputs as neurons
             outputs = []
             for idx in range(len(inputs)):
-                currNeuron = layer[layerIdx].neurons[idx]
-                currInput = inputs[idx]
-                neuronSum = currNeuron.sum(currInputs) # sum of that neuron ADD BIAS??
-                self.sigmoid(neuronSum)
+                currNeuron = self.layers[layerIdx].neurons[idx]
+                currInputs = inputs[idx]
+                neuronSum = currNeuron.sum(currInputs) + currNeuron.bias # sum of that neuron + bias of that neuron
+                neuronSum = sigmoid(neuronSum)
                 outputs.append(neuronSum)
                 inputs = outputs
             return self.feedForward(inputs, layerIdx+1)
@@ -77,12 +80,12 @@ class NeuralNetwork:
     def backprop(self):  
         return
 
-    # sigmoid function: 1 / (1 + e^ -x) 
-    def sigmoid(x): 
-        return 1.0 /(1.0 + exp(-x))
+# sigmoid function: 1 / (1 + e^ -x) 
+def sigmoid(x): 
+    return 1.0 /(1.0 + exp(-x))
 
-    # derivative of sigmoid function
-    def sigmoidDerivative(x): 
-        return sigmoid(x) * (1-sigmoid(x))   
+# derivative of sigmoid function
+def sigmoidDerivative(x): 
+    return sigmoid(x) * (1-sigmoid(x))   
 
 # https://www.kdnuggets.com/2018/04/building-convolutional-neural-network-numpy-scratch.html
