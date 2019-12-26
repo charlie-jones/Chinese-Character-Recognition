@@ -78,7 +78,26 @@
     }
     
     console.log(arr);
+
+
+    var data = "";
+    for (var i = 0; i < 128; i++) { 
+      for (var j = 0; j < 128; j++) { 
+        data += arr[i][j]; 
+        data += " ";
+      } 
+      data += "\n"; 
+    } 
     
+    
+
+    /*const fs = require('fs'); 
+      
+    fs.writeFile('grayscaleImage.txt', data, (err) => { 
+        // In case of a error throw err. 
+        if (err) throw err; 
+    }); */
+
     img.src = canvas.toDataURL('image/png');
     document.body.appendChild(img);
     
