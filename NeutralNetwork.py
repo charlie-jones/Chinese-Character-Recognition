@@ -118,6 +118,32 @@ def sigmoid(x):
 
 # derivative of sigmoid function
 def sigmoidDerivative(x): 
-    return sigmoid(x) * (1-sigmoid(x))   
+    return sigmoid(x) * (1-sigmoid(x))  
+
+# returns an array of 2d arrays, each 2d array is the data from one image
+def readTrainingData(filename):
+    f = open(filename, 'r') # open the file in read mode
+    contents = f.read()
+    contents = contents[72:]
+    input = contents.split() # convert the string to a list 
+    while 'image' in input:
+        input.remove('image')
+    input = np.reshape(input, (-1, 16385))
+    input2 = []
+    for entry in input:
+        entry = np.delete(entry, 0) # delete the index of the image
+        entry = np.reshape(entry, (128, 128)) # convert 1d to 2d array
+        entry = entry.tolist() #convert from numpy array to list
+        input2.append(entry)
+    return input2
+
+# returns a 2d array of the data from the image
+def readImageData(filename):
+    f = open(filename, 'r')
+    contents = f.read()
+    input = contents.split() # convert the string to a list
+    input = np.reshape(input, (128,128)) # convert list into 128 x 128 2d array
+    input = input.tolist() # convert numpy array to list
+    return input 
 
 # https://www.kdnuggets.com/2018/04/building-convolutional-neural-network-numpy-scratch.html
