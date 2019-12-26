@@ -67,7 +67,7 @@
       for(var w = 0; w < canvas.width; w++){
          var data = context.getImageData(w,h,1,1).data;
          console.log(w + ", " + h);
-         var avg = (data[0] + data[1] + data[2]) / 3;
+         var avg = Math.round((data[0] + data[1] + data[2]) / 3);
          //console.log(data[0]);
          //console.log(data[1]);
          //console.log(data[2]);
@@ -89,7 +89,7 @@
       data += "\n"; 
     } 
     
-    
+
 
     /*const fs = require('fs'); 
       
