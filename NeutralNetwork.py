@@ -137,6 +137,36 @@ class NeuralNetwork:
             rtn.append(b)
         return rtn 
     
+    # returns an array of  arrays, each one is the data from one image
+    def readTrainingData(self, filename):
+        f = open(filename, 'r') # open the file in read mode
+        contents = f.read()
+        contents = contents[72:]
+        input = contents.split() # convert the string to a list 
+        while 'image' in input:
+            input.remove('image')
+        input = np.reshape(input, (-1, 16385))
+        input2 = []
+        for entry in input:
+            entry = np.delete(entry, 0) # delete the index of the image
+            #entry = np.reshape(entry, (128, 128)) # convert 1d to 2d array
+            entry = entry.tolist() #convert from numpy array to list
+            input2.append(entry)
+        return input2
+    
+    # given the output from the neural net, return the character
+    # output: array of activations of the output neurons in the neural net (what feedForward returns)
+    # assumes the labels file is there and is called output.txt b/c that's what we currently have
+    def getCharacter(self, output):
+        maxVal = max(output) # get the highest activation
+        idx = output.index(maxVal) # index of the highest activation - corresponds to a character 
+        f = open('output.txt', 'r') # reading the labels file 
+        labels = f.read()
+        labels = labels.split() # convert the labels file into a list of individual strings like ['label', '100:', some character, ...]
+        i = labels.index(str(idx) + ':') 
+        rtn = labels[i+1] 
+        return rtn
+
 # sigmoid function: 1 / (1 + e^ -x) 
 def sigmoid(x): 
     return 1.0 /(1.0 + exp(-x))
@@ -145,22 +175,7 @@ def sigmoid(x):
 def sigmoidDerivative(x): 
     return sigmoid(x) * (1-sigmoid(x))  
 
-# returns an array of 2d arrays, each 2d array is the data from one image
-def readTrainingData(filename):
-    f = open(filename, 'r') # open the file in read mode
-    contents = f.read()
-    contents = contents[72:]
-    input = contents.split() # convert the string to a list 
-    while 'image' in input:
-        input.remove('image')
-    input = np.reshape(input, (-1, 16385))
-    input2 = []
-    for entry in input:
-        entry = np.delete(entry, 0) # delete the index of the image
-        #entry = np.reshape(entry, (128, 128)) # convert 1d to 2d array
-        entry = entry.tolist() #convert from numpy array to list
-        input2.append(entry)
-    return input2
+
 
 
 '''

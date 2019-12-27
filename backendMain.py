@@ -16,16 +16,22 @@ def index():
 		# pass through neural network to get label
 		nn = NeuralNetwork(16384, 6825, 5, 1)
 		output = nn.feedForward(nn.readImageData(name), 0); 
-		maxV = max(output)
-		ind = output.index(maxV)
-		print(maxV)
-		print(ind)
-		print(pinyin.get('你 好'))
-		print(pinyin.cedict.translate_word('你好'))
+		character = nn.getCharacter(output)
+		print(character)
+		print(pinyin.get(character))
+		print(pinyin.cedict.translate_word(character))
+		# print(pinyin.get('你 好'))
+		# print(pinyin.cedict.translate_word('你好'))
+		
 		# from label get the Chinese character
 		# translate character into english and pinyin
 		# return the english and pinyin (which should put as a string on the page)
-		return "blahhhh"
+		
+		# this prints the character, pinyin, and english on the page (we can change the formatting of this so it looks better)
+		rtn = "character: " + character + "<br>pinyin: " + pinyin.get(character) + "<br>english: " + str(pinyin.cedict.translate_word(character))
+		return rtn
+		# return "blahhhh
+		
 	return render_template("main.html")
 	
 
