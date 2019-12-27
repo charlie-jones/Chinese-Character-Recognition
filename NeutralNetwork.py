@@ -113,6 +113,18 @@ class NeuralNetwork:
     def backprop(self):  
         return
 
+    # returns a 2d array of the data from the image
+    # input = input from the camera as a string
+    def readImageData(input):
+        data = input.split(",") # convert the string to a list
+        #input = np.reshape(input, (128,128)) # convert list into 128 x 128 2d array
+        #data = data.tolist() # convert numpy array to list
+        rtn = []
+        for a in data:
+            b = int(a)
+            rtn.append(b)
+        return rtn 
+    
 # sigmoid function: 1 / (1 + e^ -x) 
 def sigmoid(x): 
     return 1.0 /(1.0 + exp(-x))
@@ -138,17 +150,7 @@ def readTrainingData(filename):
         input2.append(entry)
     return input2
 
-# returns a 2d array of the data from the image
-# input = input from the camera as a string
-def readImageData(input):
-    data = input.split(",") # convert the string to a list
-    #input = np.reshape(input, (128,128)) # convert list into 128 x 128 2d array
-    #data = data.tolist() # convert numpy array to list
-    rtn = []
-    for a in data:
-        b = int(a)
-        rtn.append(b)
-    return rtn 
+
 '''
 def test():
     network = NeuralNetwork(16384, 6825, 5, 1 )
