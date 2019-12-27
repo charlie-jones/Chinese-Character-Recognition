@@ -139,13 +139,16 @@ def readTrainingData(filename):
     return input2
 
 # returns a 2d array of the data from the image
-def readImageData(filename):
-    f = open(filename, 'r')
-    contents = f.read()
-    input = contents.split() # convert the string to a list
-    input = np.reshape(input, (128,128)) # convert list into 128 x 128 2d array
-    input = input.tolist() # convert numpy array to list
-    return input 
+# input = input from the camera as a string
+def readImageData(input):
+    data = input.split(",") # convert the string to a list
+    #input = np.reshape(input, (128,128)) # convert list into 128 x 128 2d array
+    #data = data.tolist() # convert numpy array to list
+    rtn = []
+    for a in data:
+        b = int(a)
+        rtn.append(b)
+    return rtn 
 '''
 def test():
     network = NeuralNetwork(16384, 6825, 5, 1 )
