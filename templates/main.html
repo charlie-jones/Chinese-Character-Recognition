@@ -100,10 +100,12 @@
 
 
     var data = "";
+    var d1 = [];
     for (var i = 0; i < 128; i++) { 
       for (var j = 0; j < 128; j++) { 
         data += arr[i][j]; 
         data += " ";
+        d1.push(arr[i][j]);
       } 
       data += "\n"; 
     } 
@@ -123,7 +125,7 @@
 
     req.open('POST', '/', true);
     req.setRequestHeader('content-type', 'application/x-www-form-urlencoded;charset=UTF-8');
-    req.send("data=" + arr); // can pass arr (2d array) or data (string)
+    req.send("data=" + d1); // can pass arr (2d array) or data (string) d1 = 1d array
     
 
 

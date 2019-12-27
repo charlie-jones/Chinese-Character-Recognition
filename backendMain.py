@@ -1,8 +1,8 @@
 from flask import Flask
 from flask import render_template
 from flask import request
-#from NeutralNetwork import NeuralNetwork, NeuralLayer, NeuralNode
-#import pinyin
+from NeutralNetwork import NeuralNetwork, NeuralLayer, NeuralNode
+#from pinyin import pinyin
 #import pinyin.cedict
 
 app = Flask(__name__)
@@ -13,6 +13,12 @@ def index():
 		name = request.form["data"]
 		print(name)
 		# pass through neural network to get label
+		# nn = NeuralNetwork(16384, 6825, 5, 1)
+		# output = nn.feedForward(name, 0); 
+		# maxV = max(output)
+		# ind = output.index(maxV)
+		# print(maxV)
+		# print(ind)
 		# from label get the Chinese character
 		# translate character into english and pinyin
 		# return the english and pinyin (which should put as a string on the page)
