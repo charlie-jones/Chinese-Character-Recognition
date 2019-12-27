@@ -5,6 +5,7 @@ py -m virtualenv env
 
 CALL ".\env\Scripts\activate.bat"
 pip install Flask
+pip install numpy
 set FLASK_APP=backendMain.py
 set FLASK_ENV=development
 flask run --host=0.0.0.0
