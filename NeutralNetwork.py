@@ -115,7 +115,7 @@ class NeuralNetwork:
 
     # returns a 2d array of the data from the image
     # input = input from the camera as a string
-    def readImageData(input):
+    def readImageData(self, input):
         data = input.split(",") # convert the string to a list
         #input = np.reshape(input, (128,128)) # convert list into 128 x 128 2d array
         #data = data.tolist() # convert numpy array to list
