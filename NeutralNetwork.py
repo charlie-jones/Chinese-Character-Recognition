@@ -46,6 +46,17 @@ class NeuralNetwork:
         # biases matrix is an array of numpy arrays, each numpy array being the biases for that layer (biases[0] is an array of the biases for the first layer after the input)
         #self.biases = [np.random.randn(a, 1) for a in self.neurons[1:]] # there are no biases for the input layer 
         self.create()
+
+        # for TRAINING neural network: backpropogate w/ Chinese database 
+        # otherwise recognize characters based on previously set weights & biases
+        try:
+            expected = self.readTrainingData("myDatabaseFilename(please change)") # last 128 in array is last row; first 128 in array make first row
+            self.backward_propagate_error(expected) # array of expected grayscale vals (weights)
+            print('training mode')
+        except:
+            print('recognition mode') # can figure out character using feedForward
+
+        
         
     def create(self):
         # first layer
