@@ -1,4 +1,4 @@
-from numpy import exp, array, random, dot, sum, zeros, pad
+from numpy import exp, array, random, dot, sum, zeros, pad, amax
 
 class Filter3x3:
     n_filters = 0
@@ -15,14 +15,32 @@ class Filter3x3:
         imageMatrix = pad(imageMatrix, (1, 1), 'constant') # pad 0s around
         h, w = imageMatrix.shape
         transformedImage = zeros((self.n_filters, h-2, w-2)) # same dimension as original image matrix
-        for i in range(h-2): # iterates all possible 3x3 regions in the image
-            for j in range(w-2):
-                temp3x3 = imageMatrix[i:(i+3), j:(j+3)] #selects 3x3 area using current indexes
-                for k in range(len(self.filters)):
+        for k in range(self.n_filters):
+            for i in range(h-2): # iterates all possible 3x3 regions in the image
+                for j in range(w-2):
+                    temp3x3 = imageMatrix[i:(i+3), j:(j+3)] #selects 3x3 area using current indexes
                     transformedImage[k, i, j] = sum(temp3x3 * self.filters[k])
         return transformedImage
-test = Filter3x3(2)
-print(test.feedForward(array([[11, 12, 5, 2, 3], [15, 6, 10, 9, 3], [10, 8, 12, 5, 3], [12,15,8,6, 3], [12,15,8,6, 3]])))
+
+    '''
+    Cuts down the size of image to get rid of redundant info
+    '''
+    def pool(self, imageMatrix, poolSize): # pool by size
+        x, h, w = imageMatrix.shape
+        h = h // poolSize
+        w = w // poolSize
+        transformedImage = zeros((self.n_filters, h, w)) # same dimension as original image matrix
+        for k in range(self.n_filters):
+            for i in range(h): # iterates all possible size x size regions in the image
+                for j in range(w):
+                    tempSel = imageMatrix[k, (i * poolSize):(i * poolSize + poolSize), (j * poolSize):(j * poolSize + poolSize)]
+                    transformedImage[k, i, j] = amax(tempSel)
+        return transformedImage
+filter = Filter3x3(1)
+test = filter.feedForward(array([[11, 12, 5, 2, 3 , 6], [15, 6, 10, 9, 3, 6], [10, 8, 12, 5, 3, 6], [12,2,9,6, 3, 12], [12,15,8,6,3, 6], [11,10,5,2,3, 4]]))
+print(test)
+test = filter.pool(test, 2)
+print(test)
 
 
 
