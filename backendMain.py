@@ -12,13 +12,14 @@ def index():
 	if request.method == "POST":
 		name = request.form["data"]
 		print(name)
+		print(type(name))
 		# pass through neural network to get label
-		# nn = NeuralNetwork(16384, 6825, 5, 1)
-		# output = nn.feedForward(name, 0); 
-		# maxV = max(output)
-		# ind = output.index(maxV)
-		# print(maxV)
-		# print(ind)
+		nn = NeuralNetwork(16384, 6825, 5, 1)
+		output = nn.feedForward(nn.readImageData(name), 0); 
+		maxV = max(output)
+		ind = output.index(maxV)
+		print(maxV)
+		print(ind)
 		# from label get the Chinese character
 		# translate character into english and pinyin
 		# return the english and pinyin (which should put as a string on the page)
