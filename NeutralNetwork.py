@@ -92,9 +92,10 @@ class NeuralNetwork:
                 for j in range(len(layer)):
                     neuron = layer[j]
                     errors.append(expected[j] - neuron.output)
-            for j in range(len(layer)):
-                neuron = layer[j]
-                neuron.delta = errors[j] * sigmoidDerivative(neuron.output)
+                    neuron.delta = errors[j] * sigmoidDerivative(neuron.output)
+            # for j in range(len(layer)):
+            #     neuron = layer[j]
+            #     neuron.delta = errors[j] * sigmoidDerivative(neuron.output)
     
     # Update network weights with error
     def update_weights(self, row, l_rate):
