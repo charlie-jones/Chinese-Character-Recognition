@@ -77,7 +77,7 @@ class NeuralNetwork:
         # hidden-to-output layer
         self.layers += [NeuralLayer(self.n_outputs,self.n_neurons_to_hl)]
 
-    #  *** this might not completely work yet, just a first draft ***  
+
     # returns the output of the network given an input
     # output of a layer is: sigmoid of (weights*input + biases)
     # input = array of =inputs
@@ -132,11 +132,6 @@ class NeuralNetwork:
                     neuron.weights[j] += l_rate * neuron.delta * inputs[j]
                 neuron.weights[-1] += l_rate * neuron.delta
 
-    # still need to do these
-    def gradientDescent(self):
-        return
-    def backprop(self):  
-        return
 
     # returns a 2d array of the data from the image
     # input = input from the camera as a string
@@ -181,6 +176,19 @@ class NeuralNetwork:
         rtn = labels[i+1] 
         return rtn
 
+    # save the weights of the network to a file named weights.txt (so we can save the weights after training the network)
+    # we can change this but currently separates layers by ";", nodes by ",", and weights by a space
+    def saveWeights(self):
+        f = open("weights.txt", "w+") # create a new file if it doesn't already exist
+        for l in self.layers:
+            for n in l.nodes:
+                for w in n.weights:
+                    f.write(str(w) + " ")
+                f.write(",")
+            f.write(";")
+        
+        f.close()
+
 # sigmoid function: 1 / (1 + e^ -x) 
 def sigmoid(x): 
     return 1.0 /(1.0 + exp(-x))
@@ -191,21 +199,4 @@ def sigmoidDerivative(x):
 
 
 
-
-'''
-def test():
-    network = NeuralNetwork(16384, 6825, 5, 1 )
-    data = readTrainingData("imageOutput2.txt")
-    data2 = []
-    for a in data:
-        b = [int(i) for i in a]
-        data2.append(b)
-    #print(type(data2[0][0]))
-    output = network.feedForward(data2[0], 0);
-    maxVal = max(output)
-    idx = output.index(maxVal)
-    print(idx)
-    return
-
-test()'''
 # https://www.kdnuggets.com/2018/04/building-convolutional-neural-network-numpy-scratch.html
