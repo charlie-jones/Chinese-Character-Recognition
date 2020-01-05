@@ -50,8 +50,19 @@ class NeuralNetwork:
         # for TRAINING neural network: backpropogate w/ Chinese database 
         # otherwise recognize characters based on previously set weights & biases
         try:
-            expected = self.readTrainingData("myDatabaseFilename(please change)") # last 128 in array is last row; first 128 in array make first row
-            self.backward_propagate_error(expected) # array of expected grayscale vals (weights)
+            # to train:
+            # expected output: activation of zero for all except the right character, activation of 1 for the right one 
+            # actual output: self.feedForward(given image from training data) = the actual activations of all the output neurons given an input
+            data = self.readTrainingData("myDatabaseFilename(please change)")
+            idx = 0
+        # ** not entirely sure if this works yet because still working on backpropagation so feel free to change this**
+            while idx < len(data): # loop thru each image in the training data
+                expected = [0.0] * 16384 
+                expected[idx] = 1.0 # the expected activation for the character it is should be 1
+                self.feedForward(data[idx], 0)
+                self.backward_propagate_error(expected)
+                self.update_weights(data[idx], 1) # what should the learning rate be? please change this, just set it to 1 here to test it
+                idx = idx + 1
             print('training mode')
         except:
             print('recognition mode') # can figure out character using feedForward
@@ -66,7 +77,7 @@ class NeuralNetwork:
         # hidden-to-output layer
         self.layers += [NeuralLayer(self.n_outputs,self.n_neurons_to_hl)]
 
-    #  *** this might not completely work yet, just a first draft ***  
+
     # returns the output of the network given an input
     # output of a layer is: sigmoid of (weights*input + biases)
     # input = array of =inputs
@@ -94,36 +105,33 @@ class NeuralNetwork:
             layer = self.layers[i]
             errors = list()
             if i != len(self.layers)-1:
-                for j in range(len(layer)):
+                for j in range(layer.n_nodes):
                     error = 0.0
-                    for neuron in self.layers[i + 1]:
+                    for neuron in self.layers[i + 1].nodes:
                         error += (neuron.weights[j] * neuron.delta)
                     errors.append(error)
             else:
-                for j in range(len(layer)):
-                    neuron = layer[j]
+                for j in range(layer.n_nodes):
+                    neuron = layer.nodes[j]
                     errors.append(expected[j] - neuron.output)
-                    neuron.delta = errors[j] * sigmoidDerivative(neuron.output)
-            # for j in range(len(layer)):
-            #     neuron = layer[j]
-            #     neuron.delta = errors[j] * sigmoidDerivative(neuron.output)
+                    #neuron.delta = errors[j] * sigmoidDerivative(neuron.output)
+            for j in range(layer.n_nodes):
+                neuron = layer.nodes[j]
+                neuron.delta = errors[j] * sigmoidDerivative(neuron.output)
     
     # Update network weights with error
+    # row = input row of data
+    # assumes feedforward and backprop have already happened with this data
     def update_weights(self, row, l_rate):
         for i in range(len(self.layers)):
             inputs = row[:-1]
             if i != 0:
-                inputs = [neuron.output for neuron in self.layers[i - 1]]
-            for neuron in self.layers[i]:
+                inputs = [neuron.output for neuron in self.layers[i - 1].nodes]
+            for neuron in self.layers[i].nodes:
                 for j in range(len(inputs)):
                     neuron.weights[j] += l_rate * neuron.delta * inputs[j]
                 neuron.weights[-1] += l_rate * neuron.delta
 
-    # still need to do these
-    def gradientDescent(self):
-        return
-    def backprop(self):  
-        return
 
     # returns a 2d array of the data from the image
     # input = input from the camera as a string
@@ -146,13 +154,14 @@ class NeuralNetwork:
         while 'image' in input:
             input.remove('image')
         input = np.reshape(input, (-1, 16385))
-        input2 = []
+        rtn = []
         for entry in input:
             entry = np.delete(entry, 0) # delete the index of the image
             #entry = np.reshape(entry, (128, 128)) # convert 1d to 2d array
             entry = entry.tolist() #convert from numpy array to list
-            input2.append(entry)
-        return input2
+            entry = [int(x) for x in entry]
+            rtn.append(entry)
+        return rtn
     
     # given the output from the neural net, return the character
     # output: array of activations of the output neurons in the neural net (what feedForward returns)
@@ -167,6 +176,19 @@ class NeuralNetwork:
         rtn = labels[i+1] 
         return rtn
 
+    # save the weights of the network to a file named weights.txt (so we can save the weights after training the network)
+    # we can change this but currently separates layers by ";", nodes by ",", and weights by a space
+    def saveWeights(self):
+        f = open("weights.txt", "w+") # create a new file if it doesn't already exist
+        for l in self.layers:
+            for n in l.nodes:
+                for w in n.weights:
+                    f.write(str(w) + " ")
+                f.write(",")
+            f.write(";")
+        
+        f.close()
+
 # sigmoid function: 1 / (1 + e^ -x) 
 def sigmoid(x): 
     return 1.0 /(1.0 + exp(-x))
@@ -177,21 +199,4 @@ def sigmoidDerivative(x):
 
 
 
-
-'''
-def test():
-    network = NeuralNetwork(16384, 6825, 5, 1 )
-    data = readTrainingData("imageOutput2.txt")
-    data2 = []
-    for a in data:
-        b = [int(i) for i in a]
-        data2.append(b)
-    #print(type(data2[0][0]))
-    output = network.feedForward(data2[0], 0);
-    maxVal = max(output)
-    idx = output.index(maxVal)
-    print(idx)
-    return
-
-test()'''
 # https://www.kdnuggets.com/2018/04/building-convolutional-neural-network-numpy-scratch.html
