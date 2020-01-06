@@ -1,4 +1,4 @@
-from numpy import exp, array, random, dot, sum, zeros, pad, amax, log arg
+from numpy import exp, array, random, dot, sum, zeros, pad, amax, log, argmax, delete, reshape, newaxis
 import os
 #128x128
 class Filter3x3:
@@ -42,8 +42,8 @@ class Filter3x3:
         lossGradientFilters = zeros(self.filters.shape)
 
         for im_region, i, j in self.iterate_regions(self.last_input):
-        for f in range(self.n_filters):
-            lossGradientFilters[f] += lossGradient[i, j, f] * im_region
+            for f in range(self.n_filters):
+                lossGradientFilters[f] += lossGradient[i, j, f] * im_region
 
         # Update filters
         self.filters -= learn_rate * lossGradientFilters
@@ -89,7 +89,7 @@ class Filter3x3:
                     for f2 in range(f):
                         for i2 in range(h2): 
                             for j2 in range(w2):
-                                if tempSel[k2, i2, j2] = amax[j2]:
+                                if tempSel[k2, i2, j2] == amax[j2]:
                                     newGradientLoss[f2, i * 2 + i2, j * 2 + j2] = lossGradient[f2, i, j]
 
         return newGradientLoss
@@ -124,10 +124,10 @@ class Filter3x3:
                 continue
 
             # e^totals
-            t_exp = np.exp(self.last_totals)
+            t_exp = exp(self.last_totals)
 
             # Sum of all e^totals
-            S = np.sum(t_exp)
+            S = sum(t_exp)
 
             # Gradients of out[i] against totals
             d_out_d_t = -t_exp[i] * t_exp / (S ** 2) ## S^2
@@ -142,7 +142,7 @@ class Filter3x3:
             d_L_d_t = gradient * d_out_d_t
         
             # Gradients of loss against weights/biases/input
-            d_L_d_w = d_t_d_w[np.newaxis].T @ d_L_d_t[np.newaxis]
+            d_L_d_w = d_t_d_w[newaxis].T @ d_L_d_t[newaxis]
             d_L_d_b = d_L_d_t * d_t_d_b
             d_L_d_inputs = d_t_d_inputs @ d_L_d_t
 
@@ -156,17 +156,14 @@ class Filter3x3:
 def readTrainingData(filename):
     f = open(filename, 'r') # open the file in read mode
     contents = f.read()
-    contents = contents[72:]
-    input = contents.split() # convert the string to a list 
-    while 'image' in input:
-        input.remove('image')
-    input = np.reshape(input, (-1, 16385))
+    input = contents.split('image ') # convert the string to a list 
+    input.pop(0) # gets rid of weird character
     rtn = []
     for entry in input:
-        entry = np.delete(entry, 0) # delete the index of the image
-        entry = np.reshape(entry, (128, 128)) # convert 1d to 2d array
-        entry = entry.tolist() #convert from numpy array to list
-        entry = [int(x) for x in entry]
+        entry = entry.split()
+        entry = entry[1:]
+        print(len(entry))
+        entry = reshape(entry, (128, 128)) # convert 1d to 2d array
         rtn.append(entry)
     return rtn
 
@@ -177,7 +174,7 @@ loss = 0
 num_correct = 0
 for filename in os.listdir('images'):
     label = 0
-    for character in readTrainingData(filename):
+    for character in readTrainingData('images/' + filename):
         if i > 0 and i % 100 == 99:
             print(
                 '[Step %d] Past 100 steps: Average Loss %.3f | Accuracy: %d%%' %
@@ -186,10 +183,10 @@ for filename in os.listdir('images'):
             loss = 0
             num_correct = 0
         
-        filter = Filter3x3(2)
+        filter = Filter3x3(4)
         # forward
         out = filter.filter(character)
-        out = filter.pool(out, 2)
+        out = filter.pool(out, 4)
         f, h, w = out.shape
         out = filter.softmax(f * h * w, 6825, out) # array of probabilities
         
@@ -199,15 +196,15 @@ for filename in os.listdir('images'):
         num_correct += acc
 
         # input for softmax backprop input
-        gradient = np.zeros(6825)
+        gradient = zeros(6825)
         gradient[label] = -1 / out[label]
 
         #backward from here
         gradient = filter.bpSoftMax(gradient, 1)
         gradient = filter.bpPool(gradient)
-        gradient = filter.bpFilter(gradiet, 1)
+        gradient = filter.bpFilter(gradient, 1)
 
-        label++
+        label+=1
 
 
 
