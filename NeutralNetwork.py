@@ -53,9 +53,9 @@ class NeuralNetwork:
             # to train:
             # expected output: activation of zero for all except the right character, activation of 1 for the right one 
             # actual output: self.feedForward(given image from training data) = the actual activations of all the output neurons given an input
+            # self.readWeights() # read the saved weights from previous training
             data = self.readTrainingData("myDatabaseFilename(please change)")
             idx = 0
-        # ** not entirely sure if this works yet because still working on backpropagation so feel free to change this**
             while idx < len(data): # loop thru each image in the training data
                 expected = [0.0] * 16384 
                 expected[idx] = 1.0 # the expected activation for the character it is should be 1
@@ -63,6 +63,7 @@ class NeuralNetwork:
                 self.backward_propagate_error(expected)
                 self.update_weights(data[idx], 1) # what should the learning rate be? please change this, just set it to 1 here to test it
                 idx = idx + 1
+            self.saveWeights() # save the current weights to weights.txt for future training
             print('training mode')
         except:
             print('recognition mode') # can figure out character using feedForward
@@ -188,6 +189,22 @@ class NeuralNetwork:
             f.write(";")
         
         f.close()
+
+    # read weights from weights.txt file and set the network's weights to those
+    def readWeights(self):
+        f = open("weights.txt", "r")
+        contents = f.read()
+        weights = contents.split(";")
+        for l in range(len(weights)-1):
+            weights[l] = weights[l].split(",")
+            for n in range(len(weights[l])-1):
+                weights[l][n] = weights[l][n].split()
+                weights[l][n] = [float(x) for x in weights[l][n]]
+
+        for l in range(len(self.layers) -1):
+            for n in range(len(self.layers[l].nodes)-1):
+                self.layers[l].nodes[n].weights = weights[l][n]
+        print(self.layers[0].nodes[0].weights[0])
 
 # sigmoid function: 1 / (1 + e^ -x) 
 def sigmoid(x): 
