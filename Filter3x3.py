@@ -1,4 +1,5 @@
 from numpy import exp, array, random, dot, sum, zeros, pad, amax, log arg
+import os
 #128x128
 class Filter3x3:
     n_filters = 0
@@ -72,8 +73,8 @@ class Filter3x3:
     '''
     Pooling back prop. reverse of pool()
     '''
-    def bpPool(self, imageMatrix, lossGradient):
-        x, h, w = imageMatrix.shape
+    def bpPool(self, lossGradient):
+        x, h, w = self.lastPoolIn.shape
         h = h // 2
         w = w // 2
         newGradientLoss = zeros(self.lastPoolIn.shape) # same dimension as original image matrix
@@ -81,7 +82,7 @@ class Filter3x3:
         for k in range(self.n_filters):
             for i in range(h): # iterates all possible size x size regions in the image
                 for j in range(w):
-                    tempSel = imageMatrix[k, (i * 2):(i * 2 + 2), (j * 2):(j * 2 + 2)]
+                    tempSel = self.lastPoolIn[k, (i * 2):(i * 2 + 2), (j * 2):(j * 2 + 2)]
                     f, h2, w2 = tempSel.shape
                     amax = amax(tempSel)
                     # loop through selection to get max pixel
@@ -151,62 +152,62 @@ class Filter3x3:
         
             return d_L_d_inputs.reshape(self.last_input_shape)
         # returns an array of  arrays, each one is the data from one image
-
-    def readTrainingData(self, filename):
-        f = open(filename, 'r') # open the file in read mode
-        contents = f.read()
-        contents = contents[72:]
-        input = contents.split() # convert the string to a list 
-        while 'image' in input:
-            input.remove('image')
-        input = np.reshape(input, (-1, 16385))
-        rtn = []
-        for entry in input:
-            entry = np.delete(entry, 0) # delete the index of the image
-            #entry = np.reshape(entry, (128, 128)) # convert 1d to 2d array
-            entry = entry.tolist() #convert from numpy array to list
-            entry = [int(x) for x in entry]
-            rtn.append(entry)
-        return rtn
+###############################################
+def readTrainingData(filename):
+    f = open(filename, 'r') # open the file in read mode
+    contents = f.read()
+    contents = contents[72:]
+    input = contents.split() # convert the string to a list 
+    while 'image' in input:
+        input.remove('image')
+    input = np.reshape(input, (-1, 16385))
+    rtn = []
+    for entry in input:
+        entry = np.delete(entry, 0) # delete the index of the image
+        entry = np.reshape(entry, (128, 128)) # convert 1d to 2d array
+        entry = entry.tolist() #convert from numpy array to list
+        entry = [int(x) for x in entry]
+        rtn.append(entry)
+    return rtn
 
 ###########################################
 
 print('started')
-
 loss = 0
 num_correct = 0
-# for loop
-# forward
-filter = Filter3x3(2)
-out = filter.filter(array([[11, 12, 5, 2, 3 , 6], [15, 6, 10, 9, 3, 6], [10, 8, 12, 5, 3, 6], [12,2,9,6, 3, 12], [12,15,8,6,3, 6], [11,10,5,2,3, 4]]))
-out = filter.pool(out, 2)
-f, h, w = out.shape
-out = filter.softmax(f * h * w, 6825, out) # array of probabilities
+for filename in os.listdir('images'):
+    label = 0
+    for character in readTrainingData(filename):
+        if i > 0 and i % 100 == 99:
+            print(
+                '[Step %d] Past 100 steps: Average Loss %.3f | Accuracy: %d%%' %
+                (i + 1, loss / 100, num_correct)
+            )
+            loss = 0
+            num_correct = 0
+        
+        filter = Filter3x3(2)
+        # forward
+        out = filter.filter(character)
+        out = filter.pool(out, 2)
+        f, h, w = out.shape
+        out = filter.softmax(f * h * w, 6825, out) # array of probabilities
+        
+        l = -log(out[label])
+        acc = 1 if argmax(out) == label else 0
+        loss += l
+        num_correct += acc
 
+        # input for softmax backprop input
+        gradient = np.zeros(6825)
+        gradient[label] = -1 / out[label]
 
+        #backward from here
+        gradient = filter.bpSoftMax(gradient, 1)
+        gradient = filter.bpPool(gradient)
+        gradient = filter.bpFilter(gradiet, 1)
 
-# input for softmax backprop input
-gradient = np.zeros(6825)
-gradient[label] = -1 / out[label]
-
-#backward from here
-filter.bpSoftMax(gradient, 1)
-
-for i, (im, label) in enumerate(zip(test_images, test_labels)):
-# Do a forward pass.
-    _, l, acc = forward(im, label)
-    loss += l
-    num_correct += acc
-    loss = -log(out[label]) # loss of accuracy for the correct answer
-    acc = 1 if argmax(out) == label else 0 # 1 = correct, 0 = incorrect
-    # Print stats every 100 steps.
-    if i % 100 == 99:
-        print(
-        '[Step %d] Past 100 steps: Average Loss %.3f | Accuracy: %d%%' %
-        (i + 1, loss / 100, num_correct)
-        )
-        loss = 0
-        num_correct = 0
+        label++
 
 
 
