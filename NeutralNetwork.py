@@ -49,11 +49,11 @@ class NeuralNetwork:
 
         # for TRAINING neural network: backpropogate w/ Chinese database 
         # otherwise recognize characters based on previously set weights & biases
+        self.readWeights()
         try:
             # to train:
             # expected output: activation of zero for all except the right character, activation of 1 for the right one 
             # actual output: self.feedForward(given image from training data) = the actual activations of all the output neurons given an input
-            # self.readWeights() # read the saved weights from previous training
             data = self.readTrainingData("myDatabaseFilename(please change)")
             idx = 0
             while idx < len(data): # loop thru each image in the training data
