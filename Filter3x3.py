@@ -112,8 +112,8 @@ class Filter3x3:
         totals = dot(input, self.weights) + self.biases
         self.lastTotals = totals
 
-        exp = exp(totals)
-        return exp / sum(exp, axis=0) # shape: 1D array of size = n_nodes. each node value = probablity of node is correct
+        ex = exp(totals)
+        return ex / sum(ex, axis=0) # shape: 1D array of size = n_nodes. each node value = probablity of node is correct
     
     '''
     Derive gradient for output
@@ -124,7 +124,7 @@ class Filter3x3:
                 continue
 
             # e^totals
-            t_exp = exp(self.last_totals)
+            t_exp = exp(self.lastTotals)
 
             # Sum of all e^totals
             S = sum(t_exp)
@@ -134,7 +134,7 @@ class Filter3x3:
             d_out_d_t[i] = t_exp[i] * (S - t_exp[i]) / (S ** 2)
             
             # Gradients of totals against weights/biases/input
-            d_t_d_w = self.last_input
+            d_t_d_w = self.lastIn
             d_t_d_b = 1
             d_t_d_inputs = self.weights
         
@@ -150,7 +150,7 @@ class Filter3x3:
             self.weights -= learn_rate * d_L_d_w
             self.biases -= learn_rate * d_L_d_b
         
-            return d_L_d_inputs.reshape(self.last_input_shape)
+            return d_L_d_inputs.reshape(self.lastInShape)
         # returns an array of  arrays, each one is the data from one image
 ###############################################
 def readTrainingData(filename):
