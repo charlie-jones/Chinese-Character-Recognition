@@ -6,6 +6,9 @@ class Filter3x3:
     filters = []
     weights = []
     biases = []
+    # generate weights and biases
+    # self.weights = random.randn(n_inputs, n_nodes) / n_inputs 
+    # self.biases = zeros(n_nodes)
 
     lastInShape = []
     lastIn = []
@@ -94,10 +97,7 @@ class Filter3x3:
     '''
     Calculate the probablity of result
     '''
-    def softmax(self, n_inputs, n_nodes, input):
-        # generate weights and biases
-        self.weights = random.randn(n_inputs, n_nodes) / n_inputs 
-        self.biases = zeros(n_nodes)
+    def softmax(self, input):
 
         self.lastInShape = input.shape # before flatten
 
@@ -149,6 +149,10 @@ class Filter3x3:
         
             return d_L_d_inputs.reshape(self.lastInShape)
 
+    def randWeightsBiases(self, n_inputs, n_nodes):
+        self.weights = random.randn(n_inputs, n_nodes) / n_inputs 
+        self.biases = zeros(n_nodes)
+
     # save the weights of the network to a file named weights.txt (so we can save the weights after training the network)
     def saveWeights(self):
         f = open("weights.txt", "w+") # create a new file if it doesn't already exist
@@ -170,8 +174,9 @@ class Filter3x3:
         self.weights = contents
 
         
-        # returns an array of  arrays, each one is the data from one image
-###############################################
+'''
+returns an array of  arrays, each one is the data from one image
+'''
 def readTrainingData(filename):
     f = open(filename, 'r') # open the file in read mode
     contents = f.read()
@@ -186,11 +191,15 @@ def readTrainingData(filename):
     return rtn
 
 ###########################################
+learning_rate = 0.0005
+num_possible_inputs = 10 # 6825
+num_filters = 8
 
 print('started')
 loss = 0
 num_correct = 0
-filter = Filter3x3(4) # # of filters
+filter = Filter3x3(num_filters) # # of filters
+filter.randWeightsBiases(num_filters * 63 * 63, num_possible_inputs)
 i = 1
 while i < 1000: # = # of chars read
     for filename in os.listdir('images'):
@@ -200,22 +209,22 @@ while i < 1000: # = # of chars read
             character = array(character, dtype='int')
             out = filter.filter(character)
             out = filter.pool(out)
-            f, h, w = out.shape
-            out = filter.softmax(f * h * w, 10, out) # array of probabilities  # 6825
-            
+            out = filter.softmax(out) # array of probabilities 
+
             l = -log(out[label])
             acc = 1 if argmax(out) == label else 0
             loss += l
             num_correct += acc
 
             # input for softmax backprop input
-            gradient = zeros(10) # 6825
+            gradient = zeros(num_possible_inputs)
             gradient[label] = -1 / out[label]
 
             #backward from here
-            gradient = filter.bpSoftMax(gradient, 1)
+            gradient = filter.bpSoftMax(gradient, learning_rate)
             gradient = filter.bpPool(gradient)
-            gradient = filter.bpFilter(gradient, 1)
+            gradient = filter.bpFilter(gradient, learning_rate)
+
             label+=1
 
             if i > 0 and i % 100 == 0:
