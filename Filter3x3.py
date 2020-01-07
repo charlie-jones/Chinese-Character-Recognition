@@ -173,6 +173,19 @@ class Filter3x3:
             contents[a] = [float(x) for x in contents[a]]
         self.weights = contents
 
+    # save biases to biases.txt
+    def saveBiases(self):
+        f = open("biases.txt", "w+")
+        for a in self.biases:
+            f.write(str(a) + " ")
+        f.close()
+    # read biases from biases.txt and set network's biases to those
+    def readBiases(self):
+        f = open("biases.txt")
+        contents = f.read()
+        contents = contents.split()
+        contents = [float(x) for x in contents]
+        self.biases = contents
         
 '''
 returns an array of  arrays, each one is the data from one image
