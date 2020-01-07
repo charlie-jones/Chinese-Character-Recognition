@@ -40,19 +40,20 @@ class Filter3x3:
     '''
     def bpFilter(self, lossGradient, learn_rate):
         lossGradientFilters = zeros(self.filters.shape)
+        h, w = self.lastFilterIn.shape
+        h = h // 2
+        w = w // 2
         for f in range(self.n_filters):
             for i in range(h): # iterates all possible size x size regions in the image
                 for j in range(w):
-                    tempSel = self.lastFilterIn[f, (i * 2):(i * 2 + 2), (j * 2):(j * 2 + 2)]
-                    lossGradientFilters[f] += lossGradient[f, i, j] * tempSel
+                    tempSel = self.lastFilterIn[(i * 2):(i * 2 + 2), (j * 2):(j * 2 + 2)]
+                    print(lossGradient[f, i, j])
+                    print(tempSel)
+                    lossGradientFilters[f] += (lossGradient[f, i, j] * tempSel)
 
         # Update filters
         self.filters -= learn_rate * lossGradientFilters
-
-        # We aren't returning anything here since we use Conv3x3 as
-        # the first layer in our CNN. Otherwise, we'd need to return
-        # the loss gradient for this layer's inputs, just like every
-        # other layer in our CNN.
+        #1st layer -> return nothing
         return None
 
     '''
@@ -189,7 +190,7 @@ for filename in os.listdir('images'):
         out = filter.filter(character)
         out = filter.pool(out)
         f, h, w = out.shape
-        out = filter.softmax(f * h * w, 6825, out) # array of probabilities
+        out = filter.softmax(f * h * w, 10, out) # array of probabilities  # 6825
         
         l = -log(out[label])
         acc = 1 if argmax(out) == label else 0
@@ -197,7 +198,7 @@ for filename in os.listdir('images'):
         num_correct += acc
 
         # input for softmax backprop input
-        gradient = zeros(6825)
+        gradient = zeros(10) # 6825
         gradient[label] = -1 / out[label]
 
         #backward from here
