@@ -1,4 +1,4 @@
-from numpy import exp, array, random, dot, sum, zeros, pad, amax, log, argmax, delete, reshape, newaxis, divide, subtract
+from numpy import exp, array, random, dot, sum, zeros, pad, amax, log, argmax, delete, reshape, newaxis, divide, subtract, multiply
 import os
 #128x128
 class Filter3x3:
@@ -41,15 +41,12 @@ class Filter3x3:
     def bpFilter(self, lossGradient, learn_rate):
         lossGradientFilters = zeros(self.filters.shape)
         h, w = self.lastFilterIn.shape
-        h = h // 2
-        w = w // 2
         for f in range(self.n_filters):
-            for i in range(h): # iterates all possible size x size regions in the image
-                for j in range(w):
-                    tempSel = self.lastFilterIn[(i * 2):(i * 2 + 2), (j * 2):(j * 2 + 2)]
-                    print(lossGradient[f, i, j])
-                    print(tempSel)
-                    lossGradientFilters[f] += (lossGradient[f, i, j] * tempSel)
+            for i in range(h-2): # iterates all possible size x size regions in the image
+                for j in range(w-2):
+
+                    tempSel = self.lastFilterIn[i:(i+3), j:(j+3)]
+                    lossGradientFilters[f] += tempSel * lossGradient[f, i, j]
 
         # Update filters
         self.filters -= learn_rate * lossGradientFilters
@@ -175,38 +172,42 @@ num_correct = 0
 for filename in os.listdir('images'):
     i = 1
     label = 0
-    for character in readTrainingData('images/' + filename):
-        if i > 0 and i % 100 == 99:
-            print(
-                '[Step %d] Past 100 steps: Average Loss %.3f | Accuracy: %d%%' %
-                (i + 1, loss / 100, num_correct)
-            )
-            loss = 0
-            num_correct = 0
-        
-        filter = Filter3x3(4)
-        # forward
-        character = array(character, dtype='int')
-        out = filter.filter(character)
-        out = filter.pool(out)
-        f, h, w = out.shape
-        out = filter.softmax(f * h * w, 10, out) # array of probabilities  # 6825
-        
-        l = -log(out[label])
-        acc = 1 if argmax(out) == label else 0
-        loss += l
-        num_correct += acc
+    while i < 1000:
+        label = 0
+        for character in readTrainingData('images/' + filename):
+            if i > 0 and i % 50 == 49:
+                print(
+                    '[Step %d] : Average Loss %.3f | Accuracy: %d%%' %
+                    (i, loss / 100, num_correct)
+                )
+                loss = 0
+                num_correct = 0
+            
+            filter = Filter3x3(4)
+            # forward
+            character = array(character, dtype='int')
+            out = filter.filter(character)
+            out = filter.pool(out)
+            f, h, w = out.shape
+            out = filter.softmax(f * h * w, 10, out) # array of probabilities  # 6825
+            
+            l = -log(out[label])
+            acc = 1 if argmax(out) == label else 0
+            loss += l
+            num_correct += acc
 
-        # input for softmax backprop input
-        gradient = zeros(10) # 6825
-        gradient[label] = -1 / out[label]
+            # input for softmax backprop input
+            gradient = zeros(10) # 6825
+            gradient[label] = -1 / out[label]
 
-        #backward from here
-        gradient = filter.bpSoftMax(gradient, 1)
-        gradient = filter.bpPool(gradient)
-        gradient = filter.bpFilter(gradient, 1)
-        print('done label: ' + str(label))
-        label+=1
+            #backward from here
+            gradient = filter.bpSoftMax(gradient, 1)
+            gradient = filter.bpPool(gradient)
+            gradient = filter.bpFilter(gradient, 1)
+            label+=1
+            i+=1
+            if i % 10 == 0:
+                print(str(i) + ": label-> " + str(label))
 
 
 
