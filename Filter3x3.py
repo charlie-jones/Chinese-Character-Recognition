@@ -191,7 +191,7 @@ def readTrainingData(filename):
     return rtn
 
 ###########################################
-learning_rate = 0.0005
+learning_rate = 0.005
 num_possible_inputs = 10 # 6825
 num_filters = 8
 
