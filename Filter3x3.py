@@ -1,4 +1,4 @@
-from numpy import exp, array, random, dot, sum, zeros, pad, amax, log, argmax, delete, reshape, newaxis
+from numpy import exp, array, random, dot, sum, zeros, pad, amax, log, argmax, delete, reshape, newaxis, divide, subtract
 import os
 #128x128
 class Filter3x3:
@@ -23,7 +23,7 @@ class Filter3x3:
     Outputs 3d array of transformed images
     '''
     def filter(self, imageMatrix): # input image 2d array/matrix
-        imageMatrix = (imageMatrix / 255) - 0.5 # make values between -0.5 and 0.5                              #
+        imageMatrix = subtract(divide(imageMatrix, 255), 0.5) # make values between -0.5 and 0.5                              #
         imageMatrix = pad(imageMatrix, (1, 1), 'constant') # pad 0s around
         self.lastFilterIn = imageMatrix
         h, w = imageMatrix.shape
@@ -162,7 +162,6 @@ def readTrainingData(filename):
     for entry in input:
         entry = entry.split()
         entry = entry[1:]
-        print(len(entry))
         entry = reshape(entry, (128, 128)) # convert 1d to 2d array
         rtn.append(entry)
     return rtn
@@ -186,8 +185,9 @@ for filename in os.listdir('images'):
         
         filter = Filter3x3(4)
         # forward
+        character = array(character, dtype='int')
         out = filter.filter(character)
-        out = filter.pool(out, 4)
+        out = filter.pool(out)
         f, h, w = out.shape
         out = filter.softmax(f * h * w, 6825, out) # array of probabilities
         
