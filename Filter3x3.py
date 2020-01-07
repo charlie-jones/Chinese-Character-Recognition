@@ -40,10 +40,11 @@ class Filter3x3:
     '''
     def bpFilter(self, lossGradient, learn_rate):
         lossGradientFilters = zeros(self.filters.shape)
-
-        for im_region, i, j in self.iterate_regions(self.last_input):
-            for f in range(self.n_filters):
-                lossGradientFilters[f] += lossGradient[i, j, f] * im_region
+        for f in range(self.n_filters):
+            for i in range(h): # iterates all possible size x size regions in the image
+                for j in range(w):
+                    tempSel = self.lastFilterIn[f, (i * 2):(i * 2 + 2), (j * 2):(j * 2 + 2)]
+                    lossGradientFilters[f] += lossGradient[f, i, j] * tempSel
 
         # Update filters
         self.filters -= learn_rate * lossGradientFilters
@@ -83,14 +84,13 @@ class Filter3x3:
             for i in range(h): # iterates all possible size x size regions in the image
                 for j in range(w):
                     tempSel = self.lastPoolIn[k, (i * 2):(i * 2 + 2), (j * 2):(j * 2 + 2)]
-                    f, h2, w2 = tempSel.shape
-                    amax = amax(tempSel)
+                    h2, w2 = tempSel.shape
+                    maxSel = amax(tempSel)
                     # loop through selection to get max pixel
-                    for f2 in range(f):
-                        for i2 in range(h2): 
-                            for j2 in range(w2):
-                                if tempSel[k2, i2, j2] == amax[j2]:
-                                    newGradientLoss[f2, i * 2 + i2, j * 2 + j2] = lossGradient[f2, i, j]
+                    for i2 in range(h2): 
+                        for j2 in range(w2):
+                            if tempSel[i2, j2] == maxSel:
+                                newGradientLoss[k, i * 2 + i2, j * 2 + j2] = lossGradient[k, i, j]
 
         return newGradientLoss
 
@@ -204,7 +204,7 @@ for filename in os.listdir('images'):
         gradient = filter.bpSoftMax(gradient, 1)
         gradient = filter.bpPool(gradient)
         gradient = filter.bpFilter(gradient, 1)
-
+        print('done label: ' + str(label))
         label+=1
 
 
