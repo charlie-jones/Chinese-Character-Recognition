@@ -173,6 +173,7 @@ print('started')
 loss = 0
 num_correct = 0
 for filename in os.listdir('images'):
+    i = 1
     label = 0
     for character in readTrainingData('images/' + filename):
         if i > 0 and i % 100 == 99:
