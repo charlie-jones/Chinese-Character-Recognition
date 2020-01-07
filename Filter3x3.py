@@ -148,6 +148,28 @@ class Filter3x3:
             self.biases -= learn_rate * d_L_d_b
         
             return d_L_d_inputs.reshape(self.lastInShape)
+
+    # save the weights of the network to a file named weights.txt (so we can save the weights after training the network)
+    def saveWeights(self):
+        f = open("weights.txt", "w+") # create a new file if it doesn't already exist
+        for a in range(len(self.weights)-1):
+            for b in self.weights[a]:
+                f.write(str(b) + " ")  
+            if a != len(self.weights) -1: # so there isn't an extra comma at the end
+                f.write(",")
+        f.close()
+
+    # read the saved weights from weights.txt and set the network's weights to those
+    def readWeights(self):
+        f = open("weights.txt", "r")
+        contents = f.read()
+        contents = contents.split(",")
+        for a in range(len(contents)-1):
+            contents[a] = contents[a].split()
+            contents[a] = [float(x) for x in contents[a]]
+        self.weights = contents
+
+        
         # returns an array of  arrays, each one is the data from one image
 ###############################################
 def readTrainingData(filename):
