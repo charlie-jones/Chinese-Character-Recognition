@@ -24,7 +24,7 @@ class Filter3x3:
     '''
     def filter(self, imageMatrix): # input image 2d array/matrix
         imageMatrix = subtract(divide(imageMatrix, 255), 0.5) # make values between -0.5 and 0.5                              #
-        imageMatrix = pad(imageMatrix, (1, 1), 'constant') # pad 0s around
+        #imageMatrix = pad(imageMatrix, (1, 1), 'constant') # pad 0s around
         self.lastFilterIn = imageMatrix
         h, w = imageMatrix.shape
         transformedImage = zeros((self.n_filters, h-2, w-2)) # same dimension as original image matrix
@@ -77,17 +77,16 @@ class Filter3x3:
         h = h // 2
         w = w // 2
         newGradientLoss = zeros(self.lastPoolIn.shape) # same dimension as original image matrix
-        
-        for k in range(self.n_filters):
-            for i in range(h): # iterates all possible size x size regions in the image
-                for j in range(w):
-                    tempSel = self.lastPoolIn[k, (i * 2):(i * 2 + 2), (j * 2):(j * 2 + 2)]
-                    h2, w2 = tempSel.shape
-                    maxSel = amax(tempSel)
-                    # loop through selection to get max pixel
+        for i in range(h): # iterates all possible size x size regions in the image
+            for j in range(w):
+                tempPoolSel = self.lastPoolIn[0:self.n_filters, (i * 2):(i * 2 + 2), (j * 2):(j * 2 + 2)]
+                f, h2, w2 = tempPoolSel.shape
+                maxSel = amax(tempPoolSel, axis=(1,2))
+                # loop through selection to get max pixel
+                for k in range(f):
                     for i2 in range(h2): 
                         for j2 in range(w2):
-                            if tempSel[i2, j2] == maxSel:
+                            if tempPoolSel[k, i2, j2] == maxSel[k]:
                                 newGradientLoss[k, i * 2 + i2, j * 2 + j2] = lossGradient[k, i, j]
 
         return newGradientLoss
@@ -175,7 +174,7 @@ for filename in os.listdir('images'):
     while i < 1000:
         label = 0
         for character in readTrainingData('images/' + filename):
-            if i > 0 and i % 50 == 49:
+            if i > 0 and i % 100 == 0:
                 print(
                     '[Step %d] : Average Loss %.3f | Accuracy: %d%%' %
                     (i, loss / 100, num_correct)
@@ -207,7 +206,7 @@ for filename in os.listdir('images'):
             label+=1
             i+=1
             if i % 10 == 0:
-                print(str(i) + ": label-> " + str(label))
+                print(str(i))
 
 
 
