@@ -170,7 +170,7 @@ loss = 0
 num_correct = 0
 filter = Filter3x3(4) # # of filters
 i = 1
-while i < 1000:
+while i < 1000: # = # of chars read
     for filename in os.listdir('images'):
         label = 0
         for character in readTrainingData('images/' + filename):
@@ -195,13 +195,14 @@ while i < 1000:
             gradient = filter.bpPool(gradient)
             gradient = filter.bpFilter(gradient, 1)
             label+=1
+
             if i > 0 and i % 100 == 0:
                 print(
                 '[Step %d] : Average Loss %.3f | Accuracy: %d%%' %
                 (i, loss / 100, num_correct)
-            )
-            loss = 0
-            num_correct = 0
+                )
+                loss = 0
+                num_correct = 0
             if i % 10 == 0:
                 print(str(i))
             i+=1
