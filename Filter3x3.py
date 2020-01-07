@@ -168,21 +168,12 @@ def readTrainingData(filename):
 print('started')
 loss = 0
 num_correct = 0
-for filename in os.listdir('images'):
-    i = 1
-    label = 0
-    while i < 1000:
+filter = Filter3x3(4) # # of filters
+i = 1
+while i < 1000:
+    for filename in os.listdir('images'):
         label = 0
         for character in readTrainingData('images/' + filename):
-            if i > 0 and i % 100 == 0:
-                print(
-                    '[Step %d] : Average Loss %.3f | Accuracy: %d%%' %
-                    (i, loss / 100, num_correct)
-                )
-                loss = 0
-                num_correct = 0
-            
-            filter = Filter3x3(4)
             # forward
             character = array(character, dtype='int')
             out = filter.filter(character)
@@ -204,9 +195,16 @@ for filename in os.listdir('images'):
             gradient = filter.bpPool(gradient)
             gradient = filter.bpFilter(gradient, 1)
             label+=1
-            i+=1
+            if i > 0 and i % 100 == 0:
+                print(
+                '[Step %d] : Average Loss %.3f | Accuracy: %d%%' %
+                (i, loss / 100, num_correct)
+            )
+            loss = 0
+            num_correct = 0
             if i % 10 == 0:
                 print(str(i))
+            i+=1
 
 
 
