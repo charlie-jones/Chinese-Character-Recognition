@@ -39,10 +39,26 @@ def index():
 		print("CHARACTER")
 		print(character)
 
+
 		# print(pinyin.get(character))
 		# print(pinyin.cedict.translate_word(character))
 		# # print(pinyin.get('你 好'))
 		# # print(pinyin.cedict.translate_word('你好'))
+		#print(pinyin.get(character))
+		#print(pinyin.cedict.translate_word(character))
+		
+		# get the label for the character
+		f = open("numLabels.txt")
+		labels = f.read()
+		labels = labels.split()
+		i = labels.index(str(character) + ':') 
+		character = labels[i+1]
+
+
+		print(pinyin.get(character))
+		print(pinyin.cedict.translate_word(character))
+		# print(pinyin.get('你 好'))
+
 		
 		# # from label get the Chinese character
 		# # translate character into english and pinyin
