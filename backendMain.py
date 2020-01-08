@@ -17,20 +17,18 @@ def index():
 
 		# PREVIOUS CODE:
 
-		nn = NeuralNetwork(16384, 6825, 5, 1)
+		# nn = NeuralNetwork(16384, 6825, 5, 1)
 		# output = nn.feedForward(nn.readImageData(name), 0); 
-		output = nn.feedForward(nn.readImageData(cDta), 0); 
-		character = nn.getCharacter(output)
+		# output = nn.feedForward(nn.readImageData(cDta), 0); 
+		# character = nn.getCharacter(output)
 
 		# NEW CODE:
 
-		# filter = Filter3x3(4)
-		# # forward
-  #       inp = array(cDta, dtype='int')
-  #       out = filter.filter(inp)
-  #       out = filter.pool(out)
-  #       out = filter.softmax(out) # array of probabilities
-  #       character = filter.getCharacter(out)
+		filter = Filter3x3()
+		filter.readWeights()
+		filter.readBiases()
+        inp = array(cDta, dtype='int')
+        character = filter.getCharacter(inp) + 1
 
 		print(character)
 		print(pinyin.get(character))
