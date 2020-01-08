@@ -1,5 +1,6 @@
 from numpy import exp, array, random, dot, sum, zeros, pad, amax, log, argmax, delete, reshape, newaxis, divide, subtract, multiply
 import os
+import pickle
 #128x128
 class Filter3x3:
     n_filters = 0
@@ -18,8 +19,7 @@ class Filter3x3:
 
     
     def __init__(self, n_filters):
-        self.n_filters = n_filters
-        self.filters = random.randn(n_filters, 3, 3) / 9 # generate 3D array (3x3xn_filters)
+
     
     '''
     Takes 2d matrix of image and transforms it with all the 3x3 filters
@@ -149,44 +149,47 @@ class Filter3x3:
         
             return d_L_d_inputs.reshape(self.lastInShape)
 
-    def randWeightsBiases(self, n_inputs, n_nodes):
-        self.weights = random.randn(n_inputs, n_nodes) / n_inputs 
+    def randWeightsBiases(self, n_filters, n_inputs, n_nodes):
+        self.n_filters = n_filters
+        self.filters = random.randn(n_filters, 3, 3) / 9 # generate 3D array (3x3xn_filters)
+        self.weights = random.randn(n_inputs, n_nodes) / n_inputs
         self.biases = zeros(n_nodes)
 
     # save the weights of the network to a file named weights.txt (so we can save the weights after training the network)
     def saveWeights(self):
-        f = open("weights.txt", "w+") # create a new file if it doesn't already exist
-        for a in range(len(self.weights)-1):
-            for b in self.weights[a]:
-                f.write(str(b) + " ")  
-            if a != len(self.weights) -1: # so there isn't an extra comma at the end
-                f.write(",")
+        f = open("weights.txt", "wb+") # create a new file if it doesn't already exist
+        pickle.dump(self.weights, f)
         f.close()
 
     # read the saved weights from weights.txt and set the network's weights to those
     def readWeights(self):
-        f = open("weights.txt", "r")
-        contents = f.read()
-        contents = contents.split(",")
-        for a in range(len(contents)-1):
-            contents[a] = contents[a].split()
-            contents[a] = [float(x) for x in contents[a]]
-        self.weights = contents
-
+        f = open("weights.txt", "rb")
+        self.weights = pickle.load(f)
+        f.close()
+        
     # save biases to biases.txt
     def saveBiases(self):
-        f = open("biases.txt", "w+")
-        for a in self.biases:
-            f.write(str(a) + " ")
+        f = open("biases.txt", "wb+")
+        pickle.dump(self.biases, f)
         f.close()
     # read biases from biases.txt and set network's biases to those
     def readBiases(self):
-        f = open("biases.txt")
-        contents = f.read()
-        contents = contents.split()
-        contents = [float(x) for x in contents]
-        self.biases = contents
-        
+        f = open("biases.txt", "rb")
+        self.biases = pickle.load(f)
+        f.close()
+####################################################
+'''
+Inputs 128x128 pixel array
+Returns label where:
+label 0 = 1
+label 1 = 2
+etc
+'''
+def getCharacter(character):
+    out = filter.filter(character)
+    out = filter.pool(out)
+    out = filter.softmax(out) # array of probabilities 
+    return argmax(out)
 '''
 returns an array of  arrays, each one is the data from one image
 '''
@@ -205,18 +208,19 @@ def readTrainingData(filename):
 
 ###########################################
 learning_rate = 0.005
-num_possible_inputs = 10 # 6825
-num_filters = 8
+num_possible_inputs = 10
+num_filters = 5
+step_progress = 50
 
 print('started')
 loss = 0
 num_correct = 0
-filter = Filter3x3(num_filters) # # of filters
-filter.randWeightsBiases(num_filters * 63 * 63, num_possible_inputs)
+filter = Filter3x3()
+filter.randWeightsBiases(num_filters, num_filters * 63 * 63, num_possible_inputs) # and random filters
 i = 1
-while i < 1000: # = # of chars read
+while i < 500: # = # of chars read
+    label = 0
     for filename in os.listdir('images'):
-        label = 0
         for character in readTrainingData('images/' + filename):
             # forward
             character = array(character, dtype='int')
@@ -238,18 +242,20 @@ while i < 1000: # = # of chars read
             gradient = filter.bpPool(gradient)
             gradient = filter.bpFilter(gradient, learning_rate)
 
-            label+=1
-
-            if i > 0 and i % 100 == 0:
+            if i > 0 and i % step_progress == 0:
                 print(
                 '[Step %d] : Average Loss %.3f | Accuracy: %d%%' %
-                (i, loss / 100, num_correct)
+                (i, loss / step_progress, num_correct / step_progress * 100)
                 )
                 loss = 0
                 num_correct = 0
             if i % 10 == 0:
                 print(str(i))
             i+=1
+        label+=1
+filter.saveWeights()
+filter.saveBiases()
+print("done. saved")
 
 
 
