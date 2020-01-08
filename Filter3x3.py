@@ -269,6 +269,11 @@ def train():
     print("done. saved")
 
 
+# training Code for class (comment it before running flask app)
+
+train()
+
+
 
                 
             
