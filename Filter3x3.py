@@ -101,7 +101,10 @@ class Filter3x3:
         self.lastIn = input # after flatten
 
         inputLen, nodes = self.weights.shape
-
+        print(self.filters.shape)
+        print(input.shape)
+        print(self.weights.shape)
+        print(self.biases.shape)
         totals = dot(input, self.weights) + self.biases
         self.lastTotals = totals
 
@@ -156,7 +159,6 @@ class Filter3x3:
         f = open("weights.txt", "wb+") # create a new file if it doesn't already exist
         pickle.dump(self.weights, f)
         f.close()
-
     # read the saved weights from weights.txt and set the network's weights to those
     def readWeights(self):
         f = open("weights.txt", "rb")
@@ -173,6 +175,17 @@ class Filter3x3:
         f = open("biases.txt", "rb")
         self.biases = pickle.load(f)
         f.close()
+
+    # save biases to biases.txt
+    def saveFilters(self):
+        f = open("filters.txt", "wb+")
+        pickle.dump(self.filters, f)
+        f.close()
+    # read biases from biases.txt and set network's biases to those
+    def readFilters(self):
+        f = open("filters.txt", "rb")
+        self.filters = pickle.load(f)
+        f.close()
 ####################################################
 '''
 Inputs 128x128 pixel array
@@ -182,7 +195,6 @@ label 1 = 2
 etc
 '''
 def getCharacter(character, filter):
-    out = array(character, dtype='int')
     out = filter.filter(character)
     out = filter.pool(out)
     out = filter.softmax(out) # array of probabilities 
@@ -253,6 +265,7 @@ def train():
             label+=1
     filter.saveWeights()
     filter.saveBiases()
+    filter.saveFilters();
     print("done. saved")
 
 

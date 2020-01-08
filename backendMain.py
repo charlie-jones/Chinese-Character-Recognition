@@ -6,17 +6,19 @@ from Filter3x3 import Filter3x3
 from Filter3x3 import getCharacter
 import pinyin
 import pinyin.cedict
+from numpy import reshape, array
 
 app = Flask(__name__)
 filter = Filter3x3()
 filter.readWeights()
 filter.readBiases()
+filter.saveFilters()
 
 @app.route("/", methods=['GET', 'POST'])
 def index():
 	if request.method == "POST":
 		cDta = request.form["data"] # now cDta is 2d array
-		print(cDta)
+		
 		# pass through neural network to get label
 
 		# PREVIOUS CODE:
@@ -25,7 +27,8 @@ def index():
 		# output = nn.feedForward(nn.readImageData(name), 0); 
 		# output = nn.feedForward(nn.readImageData(cDta), 0); 
 		# character = nn.getCharacter(output)
-
+		cDta = reshape(cDta.split(','), (128,128))
+		cDta = array(cDta, dtype='int')
 		character = getCharacter(cDta, filter)
 		character+=1
 
