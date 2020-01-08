@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<script type="text/javascript">
+var canvas, ctx, flag = false,
+    color = "black",
+    prevX = 0,
+    currX = 0,
+    prevY = 0,
+    currY = 0,
+    dot_flag = false,
+    w = 0,
+    h = 0;
+
+function init() {
+    canvas = document.getElementById('can');
+    ctx = canvas.getContext("2d");
+    ctx.fillStyle = "white";
+    w = canvas.width;
+    h = canvas.height;
+    ctx.fillRect(0,0,w,h);
+
+    canvas.addEventListener("mousemove", function (e) {
+        findxy('move', e)
+    }, false);
+    canvas.addEventListener("mousedown", function (e) {
+        findxy('down', e)
+    }, false);
+    canvas.addEventListener("mouseup", function (e) {
+        findxy('up', e)
+    }, false);
+    canvas.addEventListener("mouseout", function (e) {
+        findxy('out', e)
+    }, false);
+}
+
+function draw() {
+    ctx.beginPath();
+    ctx.moveTo(prevX, prevY);
+    ctx.lineTo(currX, currY);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 8;
+    ctx.stroke();
+    ctx.closePath();
+}
+
+function translate(){
+    ctx.drawImage(document.getElementById("canvasimg"), 128, 128);
+    var arr = new Array(128);
+    for (var i = 0; i < arr.length; i++) { 
+      arr[i] = new Array(128); 
+    } 
+
+
+    for(var h2 = 0; h2 < h; h2++){
+      for(var w2 = 0; w2 < w; w2++){
+         var data = ctx.getImageData(h2, w2, 1, 1).data;
+         arr[h2][w2] = Math.round((data[0] + data[1] + data[2]) / 3);
+      }
+    }
+
+    var req = new XMLHttpRequest();
+    
+    req.onreadystatechange = function()
+    {
+      if(this.readyState == 4 && this.status == 200) {
+        document.innerHTML = "output: " + this.responseText;
+      } 
+      /*else {
+        translation.innerHTML = "output pending.....";
+      }*/
+    }
+
+    req.open('POST', '/', true);
+    req.setRequestHeader('content-type', 'application/x-www-form-urlencoded;charset=UTF-8');
+    req.send("data=" + arr); // can pass arr (2d array) or data (string) d1 = 1d array
+}
+
+function erase() {
+    document.getElementById("canvasimg").style.border = "2px solid";
+    var dataURL = canvas.toDataURL();
+    document.getElementById("canvasimg").src = dataURL;
+    document.getElementById("canvasimg").style.display = "inline";
+    translate();
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = "white";
+    ctx.fillRect(0,0,w,h);
+}
+    
+function findxy(res, e) {
+    if (res == 'down') {
+        prevX = currX;
+        prevY = currY;
+        currX = e.clientX - canvas.offsetLeft;
+        currY = e.clientY - canvas.offsetTop;
+
+        flag = true;
+        dot_flag = true;
+        if (dot_flag) {
+            ctx.beginPath();
+            ctx.fillStyle = color;
+            ctx.fillRect(currX, currY, 2, 2);
+            ctx.closePath();
+            dot_flag = false;
+        }
+    }
+    if (res == 'up' || res == "out") {
+        flag = false;
+    }
+    if (res == 'move') {
+        if (flag) {
+            prevX = currX;
+            prevY = currY;
+            currX = e.clientX - canvas.offsetLeft;
+            currY = e.clientY - canvas.offsetTop;
+            draw();
+        }
+    }
+}
+</script>
+<body onload="init()">
+    <canvas id="can" width="128" height="128" style="position:absolute;top:10%;left:10%;border:2px solid;background-color:white;"></canvas>
+    <img id="canvasimg" style="position:absolute;top:10%;left:52%;" style="display:none;">
+    <input type="button" value="clear" id="clr" size="23" onclick="erase()" style="position:absolute;top:55%;left:15%;">
+</body>
+</html>

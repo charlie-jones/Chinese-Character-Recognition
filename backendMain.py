@@ -13,7 +13,10 @@ filter = Filter3x3()
 filter.readWeights()
 filter.readBiases()
 filter.readFilters()
-
+@app.route("/draw")
+def drawing():
+    return render_template("draw.html")
+	
 @app.route("/", methods=['GET', 'POST'])
 def index():
 	if request.method == "POST":
@@ -27,6 +30,7 @@ def index():
 		# output = nn.feedForward(nn.readImageData(name), 0); 
 		# output = nn.feedForward(nn.readImageData(cDta), 0); 
 		# character = nn.getCharacter(output)
+		
 		cDta = reshape(cDta.split(','), (128,128))
 		cDta = array(cDta, dtype='int')
 		character = getCharacter(cDta, filter)
@@ -34,18 +38,19 @@ def index():
 
 		print("CHARACTER")
 		print(character)
-		print(pinyin.get(character))
-		print(pinyin.cedict.translate_word(character))
-		# print(pinyin.get('你 好'))
-		# print(pinyin.cedict.translate_word('你好'))
+
+		# print(pinyin.get(character))
+		# print(pinyin.cedict.translate_word(character))
+		# # print(pinyin.get('你 好'))
+		# # print(pinyin.cedict.translate_word('你好'))
 		
-		# from label get the Chinese character
-		# translate character into english and pinyin
-		# return the english and pinyin (which should put as a string on the page)
+		# # from label get the Chinese character
+		# # translate character into english and pinyin
+		# # return the english and pinyin (which should put as a string on the page)
 		
-		# this prints the character, pinyin, and english on the page (we can change the formatting of this so it looks better)
-		rtn = "character: " + character + "<br>pinyin: " + pinyin.get(character) + "<br>english: " + str(pinyin.cedict.translate_word(character))
-		return rtn
+		# # this prints the character, pinyin, and english on the page (we can change the formatting of this so it looks better)
+		# rtn = "character: " + character + "<br>pinyin: " + pinyin.get(character) + "<br>english: " + str(pinyin.cedict.translate_word(character))
+		# return rtn
 		# return "blahhhh
 		
 	return render_template("main.html")
