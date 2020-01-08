@@ -181,7 +181,7 @@ label 0 = 1
 label 1 = 2
 etc
 '''
-def getCharacter(character):
+def getCharacter(character, filter):
     out = array(character, dtype='int')
     out = filter.filter(character)
     out = filter.pool(out)

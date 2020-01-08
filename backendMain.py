@@ -3,6 +3,7 @@ from flask import render_template
 from flask import request
 from NeutralNetwork import NeuralNetwork, NeuralLayer, NeuralNode
 from Filter3x3 import Filter3x3
+from Filter3x3 import getCharacter
 import pinyin
 import pinyin.cedict
 
@@ -15,7 +16,7 @@ filter.readBiases()
 def index():
 	if request.method == "POST":
 		cDta = request.form["data"] # now cDta is 2d array
-		print(cDta.shape)
+		print(cDta)
 		# pass through neural network to get label
 
 		# PREVIOUS CODE:
@@ -25,7 +26,7 @@ def index():
 		# output = nn.feedForward(nn.readImageData(cDta), 0); 
 		# character = nn.getCharacter(output)
 
-		character = filter.getCharacter(cDta)
+		character = getCharacter(cDta, filter)
 		character+=1
 
 		print(character)
