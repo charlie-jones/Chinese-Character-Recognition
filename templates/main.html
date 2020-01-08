@@ -32,16 +32,9 @@
   <h2 id="translation">translate from top left</h2>
 </div>
 
-
-
-<!-- <form action="index" method="post">
-  <label>Name:<input type="text" id="name" value="" /></label>
-  <button type="button" id="btn-post" onclick="do_ajax();">Click</button>
-  <div id="result"></div>
-</form> -->
-
-<script>
+<script>  
   'use strict';
+  
   var video = document.querySelector('video');
   var slider = document.getElementById('zoomRange');
   // create the actual video
@@ -54,14 +47,6 @@
         document.body.textContent = error;
       });
   }
-
-  /*function do_ajax() {
-        var req = new XMLHttpRequest();
-        
-        req.open('POST', '/', true);
-        req.setRequestHeader('content-type', 'application/x-www-form-urlencoded;charset=UTF-8');
-        req.send("name=" + document.getElementById('name').value);
-      }*/
 
   /**
     * takes pic from video
@@ -126,18 +111,7 @@
     req.open('POST', '/', true);
     req.setRequestHeader('content-type', 'application/x-www-form-urlencoded;charset=UTF-8');
     req.send("data=" + arr); // can pass arr (2d array) or data (string) d1 = 1d array
-    
 
-
-    /*const fs = require('fs'); 
-      
-    fs.writeFile('grayscaleImage.txt', data, (err) => { 
-        // In case of a error throw err. 
-        if (err) throw err; 
-    }); */
-
-    /*img.src = canvas.toDataURL('image/png');
-    document.body.appendChild(img);*/
     
     
   }
