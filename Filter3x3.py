@@ -16,10 +16,6 @@ class Filter3x3:
     lastTotals = 0
     lastPoolIn = []
     lastFilterIn = []
-
-    
-    def __init__(self, n_filters):
-
     
     '''
     Takes 2d matrix of image and transforms it with all the 3x3 filters
@@ -186,6 +182,7 @@ label 1 = 2
 etc
 '''
 def getCharacter(character):
+    out = array(character, dtype='int')
     out = filter.filter(character)
     out = filter.pool(out)
     out = filter.softmax(out) # array of probabilities 
@@ -207,55 +204,56 @@ def readTrainingData(filename):
     return rtn
 
 ###########################################
-learning_rate = 0.005
-num_possible_inputs = 10
-num_filters = 5
-step_progress = 50
+def train():
+    learning_rate = 0.005
+    num_possible_inputs = 10
+    num_filters = 5
+    step_progress = 50
 
-print('started')
-loss = 0
-num_correct = 0
-filter = Filter3x3()
-filter.randWeightsBiases(num_filters, num_filters * 63 * 63, num_possible_inputs) # and random filters
-i = 1
-while i < 500: # = # of chars read
-    label = 0
-    for filename in os.listdir('images'):
-        for character in readTrainingData('images/' + filename):
-            # forward
-            character = array(character, dtype='int')
-            out = filter.filter(character)
-            out = filter.pool(out)
-            out = filter.softmax(out) # array of probabilities 
+    print('started')
+    loss = 0
+    num_correct = 0
+    filter = Filter3x3()
+    filter.randWeightsBiases(num_filters, num_filters * 63 * 63, num_possible_inputs) # and random filters
+    i = 1
+    while i < 500: # = # of chars read
+        label = 0
+        for filename in os.listdir('images'):
+            for character in readTrainingData('images/' + filename):
+                # forward
+                character = array(character, dtype='int')
+                out = filter.filter(character)
+                out = filter.pool(out)
+                out = filter.softmax(out) # array of probabilities 
 
-            l = -log(out[label])
-            acc = 1 if argmax(out) == label else 0
-            loss += l
-            num_correct += acc
+                l = -log(out[label])
+                acc = 1 if argmax(out) == label else 0
+                loss += l
+                num_correct += acc
 
-            # input for softmax backprop input
-            gradient = zeros(num_possible_inputs)
-            gradient[label] = -1 / out[label]
+                # input for softmax backprop input
+                gradient = zeros(num_possible_inputs)
+                gradient[label] = -1 / out[label]
 
-            #backward from here
-            gradient = filter.bpSoftMax(gradient, learning_rate)
-            gradient = filter.bpPool(gradient)
-            gradient = filter.bpFilter(gradient, learning_rate)
+                #backward from here
+                gradient = filter.bpSoftMax(gradient, learning_rate)
+                gradient = filter.bpPool(gradient)
+                gradient = filter.bpFilter(gradient, learning_rate)
 
-            if i > 0 and i % step_progress == 0:
-                print(
-                '[Step %d] : Average Loss %.3f | Accuracy: %d%%' %
-                (i, loss / step_progress, num_correct / step_progress * 100)
-                )
-                loss = 0
-                num_correct = 0
-            if i % 10 == 0:
-                print(str(i))
-            i+=1
-        label+=1
-filter.saveWeights()
-filter.saveBiases()
-print("done. saved")
+                if i > 0 and i % step_progress == 0:
+                    print(
+                    '[Step %d] : Average Loss %.3f | Accuracy: %d%%' %
+                    (i, loss / step_progress, num_correct / step_progress * 100)
+                    )
+                    loss = 0
+                    num_correct = 0
+                if i % 10 == 0:
+                    print(str(i))
+                i+=1
+            label+=1
+    filter.saveWeights()
+    filter.saveBiases()
+    print("done. saved")
 
 
 
