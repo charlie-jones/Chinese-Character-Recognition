@@ -1,4 +1,4 @@
-from numpy import exp, array, random, dot, sum, zeros, pad, amax, log, argmax, delete, reshape, newaxis, divide, subtract, multiply
+import numpy as np
 import os
 import pickle
 #128x128
@@ -22,23 +22,23 @@ class Filter3x3:
     Outputs 3d array of transformed images
     '''
     def filter(self, imageMatrix): # input image 2d array/matrix
-        imageMatrix = subtract(divide(imageMatrix, 255), 0.5) # make values between -0.5 and 0.5                              #
+        imageMatrix = np.subtract(np.divide(imageMatrix, 255), 0.5) # make values between -0.5 and 0.5                              #
         #imageMatrix = pad(imageMatrix, (1, 1), 'constant') # pad 0s around
         self.lastFilterIn = imageMatrix
         h, w = imageMatrix.shape
-        transformedImage = zeros((self.n_filters, h-2, w-2)) # same dimension as original image matrix
+        transformedImage = np.zeros((self.n_filters, h-2, w-2)) # same dimension as original image matrix
         for k in range(self.n_filters):
             for i in range(h-2): # iterates all possible 3x3 regions in the image
                 for j in range(w-2):
                     temp3x3 = imageMatrix[i:(i+3), j:(j+3)] #selects 3x3 area using current indexes
-                    transformedImage[k, i, j] = sum(temp3x3 * self.filters[k])
+                    transformedImage[k, i, j] = np.sum(temp3x3 * self.filters[k])
         return transformedImage
     
     '''
     Backward prop for filter
     '''
     def bpFilter(self, lossGradient, learn_rate):
-        lossGradientFilters = zeros(self.filters.shape)
+        lossGradientFilters = np.zeros(self.filters.shape)
         h, w = self.lastFilterIn.shape
         for f in range(self.n_filters):
             for i in range(h-2): # iterates all possible size x size regions in the image
@@ -60,12 +60,12 @@ class Filter3x3:
         h = h // 2
         w = w // 2
         self.lastPoolIn = imageMatrix
-        transformedImage = zeros((self.n_filters, h, w)) # same dimension as original image matrix
+        transformedImage = np.zeros((self.n_filters, h, w)) # same dimension as original image matrix
         for k in range(self.n_filters):
             for i in range(h): # iterates all possible size x size regions in the image
                 for j in range(w):
                     tempSel = imageMatrix[k, (i * 2):(i * 2 + 2), (j * 2):(j * 2 + 2)]
-                    transformedImage[k, i, j] = amax(tempSel)
+                    transformedImage[k, i, j] = np.amax(tempSel)
         return transformedImage
 
     '''
@@ -75,12 +75,12 @@ class Filter3x3:
         x, h, w = self.lastPoolIn.shape
         h = h // 2
         w = w // 2
-        newGradientLoss = zeros(self.lastPoolIn.shape) # same dimension as original image matrix
+        newGradientLoss = np.zeros(self.lastPoolIn.shape) # same dimension as original image matrix
         for i in range(h): # iterates all possible size x size regions in the image
             for j in range(w):
                 tempPoolSel = self.lastPoolIn[0:self.n_filters, (i * 2):(i * 2 + 2), (j * 2):(j * 2 + 2)]
                 f, h2, w2 = tempPoolSel.shape
-                maxSel = amax(tempPoolSel, axis=(1,2))
+                maxSel = np.amax(tempPoolSel, axis=(1,2))
                 # loop through selection to get max pixel
                 for k in range(f):
                     for i2 in range(h2): 
@@ -102,11 +102,11 @@ class Filter3x3:
 
         inputLen, nodes = self.weights.shape
 
-        totals = dot(input, self.weights) + self.biases
+        totals = np.dot(input, self.weights) + self.biases
         self.lastTotals = totals
 
-        ex = exp(totals)
-        return ex / sum(ex, axis=0) # shape: 1D array of size = n_nodes. each node value = probablity of node is correct
+        ex = np.exp(totals)
+        return ex / np.sum(ex, axis=0) # shape: 1D array of size = n_nodes. each node value = probablity of node is correct
     
     '''
     Derive gradient for output
@@ -117,10 +117,10 @@ class Filter3x3:
                 continue
 
             # e^totals
-            t_exp = exp(self.lastTotals)
+            t_exp = np.exp(self.lastTotals)
 
             # Sum of all e^totals
-            S = sum(t_exp)
+            S = np.sum(t_exp)
 
             # Gradients of out[i] against totals
             d_out_d_t = -t_exp[i] * t_exp / (S ** 2) ## S^2
@@ -135,7 +135,7 @@ class Filter3x3:
             d_L_d_t = gradient * d_out_d_t
         
             # Gradients of loss against weights/biases/input
-            d_L_d_w = d_t_d_w[newaxis].T @ d_L_d_t[newaxis]
+            d_L_d_w = d_t_d_w[np.newaxis].T @ d_L_d_t[np.newaxis]
             d_L_d_b = d_L_d_t * d_t_d_b
             d_L_d_inputs = d_t_d_inputs @ d_L_d_t
 
@@ -147,9 +147,9 @@ class Filter3x3:
 
     def randWeightsBiases(self, n_filters, n_inputs, n_nodes):
         self.n_filters = n_filters
-        self.filters = random.randn(n_filters, 3, 3) / 9 # generate 3D array (3x3xn_filters)
-        self.weights = random.randn(n_inputs, n_nodes) / n_inputs
-        self.biases = zeros(n_nodes)
+        self.filters = np.random.randn(n_filters, 3, 3) / 9 # generate 3D array (3x3xn_filters)
+        self.weights = np.random.randn(n_inputs, n_nodes) / n_inputs
+        self.biases = np.zeros(n_nodes)
 
     # save the weights of the network to a file named weights.txt (so we can save the weights after training the network)
     def saveWeights(self):
@@ -197,20 +197,20 @@ def getCharacter(character, filter):
     out = filter.pool(out)
     out = filter.softmax(out) # array of probabilities 
     print(out)
-    return argmax(out)
+    return np.argmax(out)
 '''
 returns an array of  arrays, each one is the data from one image
 '''
 def readTrainingData(filename):
     f = open(filename, 'r') # open the file in read mode
     contents = f.read()
-    input = contents.split('image ') # convert the string to a list 
-    input.pop(0) # gets rid of weird character
+    input = contents.split('image ') # convert the string to a list
+    input.pop(0) # gets rid of weird character (ï»¿)
     rtn = []
     for entry in input:
         entry = entry.split()
         entry = entry[1:]
-        entry = reshape(entry, (128, 128)) # convert 1d to 2d array
+        entry = np.reshape(entry, (128, 128)) # convert 1d to 2d array
         rtn.append(entry)
     return rtn
 
@@ -218,8 +218,8 @@ def readTrainingData(filename):
 def train():
     learning_rate = 0.005 # making too high might cause overflow errors
     num_possible_inputs = 10
-    num_filters = 8
-    step_progress = 20
+    num_filters = 5
+    step_progress = 10
     num_chars_read = 50
 
     print('started')
@@ -228,22 +228,25 @@ def train():
     filter = Filter3x3()
     filter.randWeightsBiases(num_filters, num_filters * 63 * 63, num_possible_inputs) # and random filters
     i = 1
+    labels = [0,1,2,3,4,5,6,7,8,9]
     for filename in os.listdir('images'):
-        label = 0
-        for character in readTrainingData('images/' + filename):
+        np.random.shuffle(labels)
+        data = readTrainingData('images/' + filename)
+        for label in labels:
+            character = data[label]
             # forward
-            character = array(character, dtype='int')
+            character = np.array(character, dtype='int')
             out = filter.filter(character)
             out = filter.pool(out)
             out = filter.softmax(out) # array of probabilities 
 
-            l = -log(out[label])
-            acc = 1 if argmax(out) == label else 0
+            l = -np.log(out[label])
+            acc = 1 if np.argmax(out) == label else 0
             loss += l
             num_correct += acc
 
             # input for softmax backprop input
-            gradient = zeros(num_possible_inputs)
+            gradient = np.zeros(num_possible_inputs)
             gradient[label] = -1 / out[label]
 
             #backward from here
@@ -262,7 +265,6 @@ def train():
             if i % 10 == 0:
                 print(str(i))
             i+=1
-            label+=1
     filter.saveWeights()
     filter.saveBiases()
     filter.saveFilters();
@@ -271,7 +273,7 @@ def train():
 
 # training Code for class (comment it before running flask app)
 
-train()
+#rain()
 
 
 
