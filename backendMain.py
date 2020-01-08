@@ -12,7 +12,7 @@ app = Flask(__name__)
 filter = Filter3x3()
 filter.readWeights()
 filter.readBiases()
-filter.saveFilters()
+filter.readFilters()
 
 @app.route("/", methods=['GET', 'POST'])
 def index():
@@ -32,6 +32,7 @@ def index():
 		character = getCharacter(cDta, filter)
 		character+=1
 
+		print("CHARACTER")
 		print(character)
 		print(pinyin.get(character))
 		print(pinyin.cedict.translate_word(character))

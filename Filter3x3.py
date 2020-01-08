@@ -101,10 +101,7 @@ class Filter3x3:
         self.lastIn = input # after flatten
 
         inputLen, nodes = self.weights.shape
-        print(self.filters.shape)
-        print(input.shape)
-        print(self.weights.shape)
-        print(self.biases.shape)
+
         totals = dot(input, self.weights) + self.biases
         self.lastTotals = totals
 
@@ -185,6 +182,7 @@ class Filter3x3:
     def readFilters(self):
         f = open("filters.txt", "rb")
         self.filters = pickle.load(f)
+        self.n_filters = self.filters.shape[0]
         f.close()
 ####################################################
 '''
@@ -220,7 +218,7 @@ def train():
     learning_rate = 0.005
     num_possible_inputs = 10
     num_filters = 5
-    step_progress = 50
+    step_progress = 100
 
     print('started')
     loss = 0
@@ -271,7 +269,7 @@ def train():
 
 # training Code for class (comment it before running flask app)
 
-train()
+#train()
 
 
 
