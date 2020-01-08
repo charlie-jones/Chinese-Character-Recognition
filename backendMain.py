@@ -10,13 +10,28 @@ app = Flask(__name__)
 @app.route("/", methods=['GET', 'POST'])
 def index():
 	if request.method == "POST":
-		name = request.form["data"]
-		print(name)
-		print(type(name))
+		cDta = request.form["data"] # now cDta is 2d array
+		print(cDta)
+		print(type(cDta))
 		# pass through neural network to get label
+
+		# PREVIOUS CODE:
+
 		nn = NeuralNetwork(16384, 6825, 5, 1)
-		output = nn.feedForward(nn.readImageData(name), 0); 
+		# output = nn.feedForward(nn.readImageData(name), 0); 
+		output = nn.feedForward(nn.readImageData(cDta), 0); 
 		character = nn.getCharacter(output)
+
+		# NEW CODE:
+
+		# filter = Filter3x3(4)
+		# # forward
+  #       inp = array(cDta, dtype='int')
+  #       out = filter.filter(inp)
+  #       out = filter.pool(out)
+  #       out = filter.softmax(out) # array of probabilities
+  #       character = filter.getCharacter(out)
+
 		print(character)
 		print(pinyin.get(character))
 		print(pinyin.cedict.translate_word(character))
