@@ -65,7 +65,7 @@ class Filter3x3:
             for i in range(h): # iterates all possible size x size regions in the image
                 for j in range(w):
                     tempSel = imageMatrix[k, (i * 2):(i * 2 + 2), (j * 2):(j * 2 + 2)]
-                    transformedImage[k, i, j] = np.amax(tempSel)
+                    transformedImage[k, i, j] = np.amax(tempSel) # was amax
         return transformedImage
 
     '''
@@ -80,7 +80,7 @@ class Filter3x3:
             for j in range(w):
                 tempPoolSel = self.lastPoolIn[0:self.n_filters, (i * 2):(i * 2 + 2), (j * 2):(j * 2 + 2)]
                 f, h2, w2 = tempPoolSel.shape
-                maxSel = np.amax(tempPoolSel, axis=(1,2))
+                maxSel = np.amax(tempPoolSel, axis=(1,2)) # was amax
                 # loop through selection to get max pixel
                 for k in range(f):
                     for i2 in range(h2): 
@@ -193,6 +193,11 @@ label 1 = 2
 etc
 '''
 def getCharacter(character, filter):
+    character = np.rot90(character, 3, (0,1))
+    character = np.flip(character, 1)
+    character[character > 155] = 255
+    character[character <= 155] = 0
+    np.savetxt(".memer.txt", character,fmt="%d")
     out = filter.filter(character)
     out = filter.pool(out)
     out = filter.softmax(out) # array of probabilities 
@@ -218,9 +223,8 @@ def readTrainingData(filename):
 def train():
     learning_rate = 0.005 # making too high might cause overflow errors
     num_possible_inputs = 10
-    num_filters = 5
-    step_progress = 10
-    num_chars_read = 50
+    num_filters = 6
+    step_progress = 100
 
     print('started')
     loss = 0
@@ -253,8 +257,7 @@ def train():
             gradient = filter.bpSoftMax(gradient, learning_rate)
             gradient = filter.bpPool(gradient)
             gradient = filter.bpFilter(gradient, learning_rate)
-            if i == num_chars_read:
-                break
+
             if i > 0 and i % step_progress == 0:
                 print(
                 '[Step %d] : Average Loss %.3f | Accuracy: %d%%' %
@@ -273,7 +276,7 @@ def train():
 
 # training Code for class (comment it before running flask app)
 
-#rain()
+train()
 
 
 
