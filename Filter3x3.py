@@ -276,7 +276,7 @@ def train():
 
 # training Code for class (comment it before running flask app)
 
-train()
+#train()
 
 
 
