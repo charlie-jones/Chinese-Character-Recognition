@@ -193,8 +193,8 @@ label 1 = 2
 etc
 '''
 def getCharacter(character, filter):
-    character = np.rot90(character, 3, (0,1))
-    character = np.flip(character, 1)
+    # character = np.rot90(character, 3, (0,1))
+    # character = np.flip(character, 1)
     character[character > 155] = 255
     character[character <= 155] = 0
     np.savetxt(".memer.txt", character,fmt="%d")
@@ -276,7 +276,7 @@ def train():
 
 # training Code for class (comment it before running flask app)
 
-train()
+#train()
 
 
 

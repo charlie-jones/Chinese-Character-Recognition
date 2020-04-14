@@ -48,11 +48,12 @@ def index():
 		#print(pinyin.cedict.translate_word(character))
 		
 		# get the label for the character
-		f = open("numLabels.txt")
+		f = open("numLabels.txt", encoding="utf8")
 		labels = f.read()
 		labels = labels.split()
 		i = labels.index(str(character) + ':') 
 		character = labels[i+1]
+		print(character)
 
 
 		print(pinyin.get(character))
@@ -65,8 +66,8 @@ def index():
 		# # return the english and pinyin (which should put as a string on the page)
 		
 		# # this prints the character, pinyin, and english on the page (we can change the formatting of this so it looks better)
-		# rtn = "character: " + character + "<br>pinyin: " + pinyin.get(character) + "<br>english: " + str(pinyin.cedict.translate_word(character))
-		# return rtn
+		rtn = "character: " + character + "<br>pinyin: " + pinyin.get(character) + "<br>english: " + str(pinyin.cedict.translate_word(character))
+		return rtn
 		# return "blahhhh
 		
 	return render_template("main.html")
