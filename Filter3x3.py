@@ -197,7 +197,6 @@ def getCharacter(character, filter):
     # character = np.flip(character, 1)
     character[character > 155] = 255
     character[character <= 155] = 0
-    np.savetxt(".memer.txt", character,fmt="%d")
     out = filter.filter(character)
     out = filter.pool(out)
     out = filter.softmax(out) # array of probabilities 
@@ -224,7 +223,7 @@ def train():
     learning_rate = 0.005 # making too high might cause overflow errors
     num_possible_inputs = 10
     num_filters = 6
-    step_progress = 100
+    step_progress = 10
 
     print('started')
     loss = 0
@@ -249,6 +248,8 @@ def train():
             loss += l
             num_correct += acc
 
+            print(str(np.argmax(out)) + ":" + str(label))
+
             # input for softmax backprop input
             gradient = np.zeros(num_possible_inputs)
             gradient[label] = -1 / out[label]
@@ -260,13 +261,11 @@ def train():
 
             if i > 0 and i % step_progress == 0:
                 print(
-                '[Step %d] : Average Loss %.3f | Accuracy: %d%%' %
+                filename + ' : [Step %d] : Average Loss %.3f | Accuracy: %d%%' %
                 (i, loss / step_progress, num_correct / step_progress * 100)
                 )
                 loss = 0
                 num_correct = 0
-            if i % 10 == 0:
-                print(str(i))
             i+=1
     filter.saveWeights()
     filter.saveBiases()
@@ -276,7 +275,7 @@ def train():
 
 # training Code for class (comment it before running flask app)
 
-#train()
+train()
 
 
 
