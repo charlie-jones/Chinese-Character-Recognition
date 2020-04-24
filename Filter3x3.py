@@ -1,15 +1,17 @@
+import mnist
 import numpy as np
 import os
 import pickle
 #128x128
 class Filter3x3:
-    n_filters = 0
+    n_filters = 6
     filters = []
     weights = []
     biases = []
     # generate weights and biases
     # self.weights = random.randn(n_inputs, n_nodes) / n_inputs 
     # self.biases = zeros(n_nodes)
+    
 
     lastInShape = []
     lastIn = []
@@ -168,7 +170,7 @@ class Filter3x3:
         pickle.dump(self.biases, f)
         f.close()
     # read biases from biases.txt and set network's biases to those
-    def readBiases(self):
+    def readBiases(self): 
         f = open("biases.txt", "rb")
         self.biases = pickle.load(f)
         f.close()
@@ -193,15 +195,23 @@ label 1 = 2
 etc
 '''
 def getCharacter(character, filter):
-    # character = np.rot90(character, 3, (0,1))
-    # character = np.flip(character, 1)
-    character[character > 155] = 255
+    character = np.array(character, dtype='int')
     character[character <= 155] = 0
+    character[character > 155] = 255
+    for i in character:
+        for j in i:
+            print(str(j) + " ", end="")
+        print("")
     out = filter.filter(character)
     out = filter.pool(out)
     out = filter.softmax(out) # array of probabilities 
     print(out)
-    return np.argmax(out)
+    largest = np.argmax(out);
+    out[largest] = -1
+    secondlargest = np.argmax(out);
+    out[secondlargest] = -1
+    thirdlargest = np.argmax(out);
+    return (largest,secondlargest, thirdlargest)
 '''
 returns an array of  arrays, each one is the data from one image
 '''
@@ -219,65 +229,125 @@ def readTrainingData(filename):
     return rtn
 
 ###########################################
+# def train():
+#     learning_rate = 0.005 # making too high might cause overflow errors
+#     num_possible_inputs = 10
+#     num_filters = 6
+#     step_progress = 10
+
+#     print('started')
+#     loss = 0
+#     num_correct = 0
+#     filter = Filter3x3()
+#     filter.randWeightsBiases(num_filters, num_filters * 63 * 63, num_possible_inputs) # and random filters
+#     i = 1
+#     labels = [0,1,2,3,4,5,6,7,8,9]
+#     for filename in os.listdir('images'):
+#         np.random.shuffle(labels)
+#         data = readTrainingData('images/' + filename)
+#         for label in labels:
+#             character = data[label]
+#             # forward
+#             character = np.array(character, dtype='int')
+#             out = filter.filter(character)
+#             out = filter.pool(out)
+#             out = filter.softmax(out) # array of probabilities 
+
+#             l = -np.log(out[label])
+#             acc = 1 if np.argmax(out) == label else 0
+#             loss += l
+#             num_correct += acc
+
+#             print(str(np.argmax(out)) + ":" + str(label))
+
+#             # input for softmax backprop input
+#             gradient = np.zeros(num_possible_inputs)
+#             gradient[label] = -1 / out[label]
+
+#             #backward from here
+#             gradient = filter.bpSoftMax(gradient, learning_rate)
+#             gradient = filter.bpPool(gradient)
+#             gradient = filter.bpFilter(gradient, learning_rate)
+
+#             if i > 0 and i % step_progress == 0:
+#                 print(
+#                 filename + ' : [Step %d] : Average Loss %.3f | Accuracy: %d%%' %
+#                 (i, loss / step_progress, num_correct / step_progress * 100)
+#                 )
+#                 loss = 0
+#                 num_correct = 0
+#             i+=1
+#     filter.saveWeights()
+#     filter.saveBiases()
+#     filter.saveFilters()
+#     print("done. saved")
+
+
 def train():
+    # LOOK AT TEST DATA
+    train_images = mnist.train_images()
+    train_labels = mnist.train_labels()
     learning_rate = 0.005 # making too high might cause overflow errors
     num_possible_inputs = 10
     num_filters = 6
-    step_progress = 10
+    step_progress = 100
 
     print('started')
     loss = 0
     num_correct = 0
     filter = Filter3x3()
-    filter.randWeightsBiases(num_filters, num_filters * 63 * 63, num_possible_inputs) # and random filters
-    i = 1
-    labels = [0,1,2,3,4,5,6,7,8,9]
-    for filename in os.listdir('images'):
-        np.random.shuffle(labels)
-        data = readTrainingData('images/' + filename)
-        for label in labels:
-            character = data[label]
-            # forward
-            character = np.array(character, dtype='int')
-            out = filter.filter(character)
-            out = filter.pool(out)
-            out = filter.softmax(out) # array of probabilities 
+    filter.randWeightsBiases(num_filters, num_filters * 13 * 13, num_possible_inputs) # and random filters
 
-            l = -np.log(out[label])
-            acc = 1 if np.argmax(out) == label else 0
-            loss += l
-            num_correct += acc
+    permutation = np.random.permutation(len(train_images))
+    train_images = train_images[permutation]
+    train_labels = train_labels[permutation]
+    for i, (character, label) in enumerate(zip(train_images, train_labels)):
+        character = np.array(character, dtype='int')
+        character[character <= 155] = 0
+        character[character > 155] = 255
 
-            print(str(np.argmax(out)) + ":" + str(label))
+        out = filter.filter(character)
+        out = filter.pool(out)
+        out = filter.softmax(out) # array of probabilities 
 
-            # input for softmax backprop input
-            gradient = np.zeros(num_possible_inputs)
-            gradient[label] = -1 / out[label]
+        l = -np.log(out[label])
+        acc = 1 if np.argmax(out) == label else 0
+        loss += l
+        num_correct += acc
 
-            #backward from here
-            gradient = filter.bpSoftMax(gradient, learning_rate)
-            gradient = filter.bpPool(gradient)
-            gradient = filter.bpFilter(gradient, learning_rate)
+        # input for softmax backprop input
+        gradient = np.zeros(num_possible_inputs)
+        gradient[label] = -1 / out[label]
 
-            if i > 0 and i % step_progress == 0:
-                print(
-                filename + ' : [Step %d] : Average Loss %.3f | Accuracy: %d%%' %
-                (i, loss / step_progress, num_correct / step_progress * 100)
-                )
-                loss = 0
-                num_correct = 0
-            i+=1
+        #backward from here
+        gradient = filter.bpSoftMax(gradient, learning_rate)
+        gradient = filter.bpPool(gradient)
+        gradient = filter.bpFilter(gradient, learning_rate)
+
+        if i > 0 and i % step_progress == 0:
+            print(
+            '[Step %d] : Average Loss %.3f | Accuracy: %d%%' %
+            (i, loss / step_progress, num_correct / step_progress * 100)
+            )
+            loss = 0
+            num_correct = 0
+        i+=1
     filter.saveWeights()
     filter.saveBiases()
-    filter.saveFilters();
+    filter.saveFilters()
     print("done. saved")
-
 
 # training Code for class (comment it before running flask app)
 
-train()
+#train() 
+# hi = Filter3x3()
+# hi.readWeights()
+# hi.readBiases()
+# hi.readFilters()
+# test_images = mnist.test_images()[3]
+# getCharacter(test_images, hi)
 
 
 
                 
-            
+        
