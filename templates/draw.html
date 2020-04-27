@@ -2,7 +2,7 @@
 <html>
 <script type="text/javascript">
 var canvas, ctx, flag = false,
-    color = "white",
+    color = "black",
     prevX = 0,
     currX = 0,
     prevY = 0,
@@ -14,7 +14,7 @@ var canvas, ctx, flag = false,
 function init() {
     canvas = document.getElementById('can');
     ctx = canvas.getContext("2d");
-    ctx.fillStyle = "black";
+    ctx.fillStyle = "white";
     w = canvas.width;
     h = canvas.height;
     ctx.fillRect(0,0,w,h);
@@ -44,9 +44,9 @@ function draw() {
 }
 
 function translate(){
-    var arr = new Array(28);
+    var arr = new Array(128);
     for (var i = 0; i < arr.length; i++) { 
-      arr[i] = new Array(28); 
+      arr[i] = new Array(128); 
     } 
 
 
@@ -76,7 +76,7 @@ function translate(){
 function erase() {
     translate();
     ctx.clearRect(0, 0, w, h);
-    ctx.fillStyle = "black";
+    ctx.fillStyle = "white";
     ctx.fillRect(0,0,w,h);
 }
     
@@ -112,7 +112,7 @@ function findxy(res, e) {
 }
 </script>
 <body onload="init()">
-    <canvas id="can" width="28" height="28" style="border:2px solid;background-color:black;"></canvas>
+    <canvas id="can" width="128" height="128" style="border:2px solid;background-color:white;"></canvas>
     <br>
     <input type="button" value="Clear & Translate" id="clr" size="23" onclick="erase()">      
 </body>

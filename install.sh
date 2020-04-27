@@ -6,8 +6,9 @@ source env/bin/activate
 
 pip3 install --upgrade pip
 pip3 install Flask
-pip install pinyin
-pip install numpy
+pip3 install pinyin
+pip3 install python-mnist
+pip3 install numpy
 
 
 

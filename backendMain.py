@@ -17,7 +17,7 @@ filter.readFilters()
 def drawing():
 	if request.method == "POST":
 		cDta = request.form["data"]
-		cDta = reshape(cDta.split(','),(28,28))
+		cDta = reshape(cDta.split(','),(128,128))
 		cDta = array(cDta, dtype='int')
 		cDta = rot90(cDta, 3, (0,1))#only draw
 		cDta = flip(cDta, 1)#only draw
@@ -25,41 +25,59 @@ def drawing():
 		print("1st choice: " + str(characters[0]))
 		print("2nd choice: " + str(characters[1]))
 		print("3rd choice: " + str(characters[2]))
-		print("---------------------------------")
+		f = open("numLabels.txt", encoding="utf8")
+		labels = f.read()
+		labels = labels.split()
+		for x in range(3):
+			i = labels.index(str(characters[x]) + ':') 
+			character = labels[i+1]
+			print(character)
+			print(pinyin.get(character))
+			print(pinyin.cedict.translate_word(character))
+			print("---------------------------------")
 	return render_template("draw.html")
 	
 @app.route("/", methods=['GET', 'POST'])
 def index():
 	if request.method == "POST":
 		cDta = request.form["data"] # now cDta is 2d array
-
-		# if request.form["train"] is not None: # add train data from website
-    	# 	for i in range(cDta):
-    	# 			charArray = cDta # 2d array
-    	# 	return
 		
 		# pass through neural network to get label
-		
-		cDta = reshape(cDta.split(','), (28,28))
-		cDta = array(cDta, dtype='int')
 
-		character = getCharacter(cDta, filter)
+		# PREVIOUS CODE:
+
+		# nn = NeuralNetwork(16384, 6825, 5, 1)
+		# output = nn.feedForward(nn.readImageData(name), 0); 
+		# output = nn.feedForward(nn.readImageData(cDta), 0); 
+		# character = nn.getCharacter(output)
+		
+		cDta = reshape(cDta.split(','), (128,128))
+		cDta = array(cDta, dtype='int')
+		character = getCharacter(cDta, filter)[0]-1
+		character+=1
 
 		print("CHARACTER")
 		print(character)
-		print("-")
-		
-		# get the label for the character
-		# f = open("numLabels.txt", encoding="utf8")
-		# labels = f.read()
-		# labels = labels.split()
-		# i = labels.index(str(character) + ':') 
-		# character = labels[i+1]
-		# print(character)
 
 
 		# print(pinyin.get(character))
 		# print(pinyin.cedict.translate_word(character))
+		# # print(pinyin.get('你 好'))
+		# # print(pinyin.cedict.translate_word('你好'))
+		#print(pinyin.get(character))
+		#print(pinyin.cedict.translate_word(character))
+		
+		# get the label for the character
+		f = open("numLabels.txt", encoding="utf8")
+		labels = f.read()
+		labels = labels.split()
+		i = labels.index(str(character) + ':') 
+		character = labels[i+1]
+		print(character)
+
+
+		print(pinyin.get(character))
+		print(pinyin.cedict.translate_word(character))
 		# print(pinyin.get('你 好'))
 
 		
@@ -68,9 +86,11 @@ def index():
 		# # return the english and pinyin (which should put as a string on the page)
 		
 		# # this prints the character, pinyin, and english on the page (we can change the formatting of this so it looks better)
-		# rtn = "character: " + character + "<br>pinyin: " + pinyin.get(character) + "<br>english: " + str(pinyin.cedict.translate_word(character))
-		# return rtn		
-	return render_template("main.html", )
+		rtn = "character: " + character + "<br>pinyin: " + pinyin.get(character) + "<br>english: " + str(pinyin.cedict.translate_word(character))
+		return rtn
+		# return "blahhhh
+		
+	return render_template("main.html")
 	
 
 #@app.route('/get_names', methods=['POST'])
