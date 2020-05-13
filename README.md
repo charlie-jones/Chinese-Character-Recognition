@@ -1,5 +1,7 @@
 Convolutional Neural Network w/ training for Chinese Numbers 1-10: 
-git checkout b78afc80fb48f70be58f11959f0044d9485f663c
+git checkout 4f28164da5546785320b21f08aa17d698c22df1a
 
 Convolutional Neural Network w/ training for Arabic digits:  
-git checkout 047672957f628aad82e62578d0741eabfb7772e0
+git checkout 5630f09ac6b4f7ceffd9513e0ec45fb26b0b6216
+
+If you would like to train the CNN, please make an images folder that stores your training data.
