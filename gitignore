@@ -3,3 +3,4 @@ env/
 character/
 images/
 oldimages/
+.DS_Store
