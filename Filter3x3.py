@@ -2,8 +2,11 @@ import numpy as np
 import os
 import pickle
 #128x128
+
 class Filter3x3:
     n_filters = 0
+    PATH_NAME = '' # set this if you want to train it
+
     filters = []
     weights = []
     biases = []
@@ -251,7 +254,7 @@ def train():
     filter.readBiases() #self.biases = np.zeros(n_nodes)
     i = 1
     labels = [0,1,2,3,4,5,6,7,8,9]
-    path = '/Users/jones/Chinese-Character-Recognition/images/'
+    path = PATH_NAME + 'images/'
     for filename in os.listdir(path):
         np.random.shuffle(labels)
         data = readTrainingData(path + filename)
@@ -297,8 +300,7 @@ def train():
 
 #train()
 
-# path = '/Users/jones/Chinese-Character-Recognition/images/'
-# for filename in os.listdir(path):
+# for filename in os.listdir('[more here]/images'):
 #     data = readTrainingData(path + filename)
 #     character = data[6]
 #     character = np.array(character, dtype='int')

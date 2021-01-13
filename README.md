@@ -1,7 +1,19 @@
-Convolutional Neural Network w/ training for Chinese Numbers 1-10: 
-git checkout 6ddce10c58f777253a4ffe6b17dcff49fba1d63f
+## How to Use
 
-Convolutional Neural Network w/ training for Arabic digits:  
-git checkout 3c965bef1c17f5dd4e686192b4a3af9c4c649002
+NOTE: you should know how to read Chinese numbers 1-10 to test this project (you can skip to the code section if you don't)
 
-If you would like to train the CNN, please make a folder named "images" that stores your training data.
+1. clone or download this project and cd into 'Chinese-Character-Recognition' folder
+
+2. source install.sh for mac or run the .bat on windows
+
+3. export FLASK_APP = 'backendMain.py'
+
+4. flask run; then open localhost:5000
+
+5. On the home page, you input the Chinese character through the webcam. Going to /draw might be easier because then you can draw the character. 
+
+6. View the output in the terminal!
+
+## Code
+
+This project was built using a handmade Convolutional Neural Network (CNN) in Filter3x3.py for learning purposes. If you don't know about it yet, please check out tensorflow since it has prebuilt models and might be better for your project than handmaking everything!

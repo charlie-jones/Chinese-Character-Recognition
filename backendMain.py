@@ -1,7 +1,7 @@
 from flask import Flask
 from flask import render_template
 from flask import request
-from NeutralNetwork import NeuralNetwork, NeuralLayer, NeuralNode
+#from NeutralNetwork import NeuralNetwork, NeuralLayer, NeuralNode
 from Filter3x3 import Filter3x3
 from Filter3x3 import getCharacter
 import pinyin
